@@ -1,0 +1,23 @@
+{
+  "name": "coinche",
+  "version": "1.0.0",
+  "main": "dist/server.js",
+  "scripts": {
+    "build-ts": "tsc",
+    "postinstall": "npm run build-ts",
+    "start": "npm run serve",
+    "serve": "node dist/server.js",
+    "watch-node": "nodemon dist/server.js",
+    "watch-ts": "tsc -w"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": "10.16.0"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.3"
+  }
+}
