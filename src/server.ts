@@ -1,8 +1,6 @@
 import express from 'express';
 import { ObjectID, MongoClient } from 'mongodb';
 import { ApolloServer, gql } from 'apollo-server-express';
-import { resolve, join } from 'path';
-import { readdirSync } from 'fs';
 
 
 /*
@@ -117,13 +115,11 @@ const resolvers = {
 	const PORT = process.env.PORT || 3000;
 	const app = express();
 
-	const staticPath = resolve('./frontdist');
-	
 	server.applyMiddleware({
 		app: app,
 		path: graphqlPath,
 	});
-	app.use('/', express.static(staticPath));
+	app.use('/', express.static('frontdist'));
 	app.listen(PORT, () => console.log(`Listening on port ${PORT}!`));
 })();
 
