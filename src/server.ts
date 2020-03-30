@@ -1,7 +1,7 @@
 import express from 'express';
 import { ObjectID, MongoClient } from 'mongodb';
 import { ApolloServer, gql } from 'apollo-server-express';
-import { join } from 'path';
+import { join, resolve } from 'path';
 
 /*
 créer partie
@@ -115,6 +115,8 @@ const resolvers = {
 	const PORT = process.env.PORT || 3000;
 	const app = express();
 
+	console.log("aaa", __dirname, resolve('.'));
+	
 	app.use('/', express.static(join(__dirname, '../frontdist')));
 	server.applyMiddleware({
 		app: app,
