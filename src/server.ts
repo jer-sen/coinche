@@ -14,6 +14,7 @@ mélanger
 couper
 distribuer
 
+trier
 mettre devant
 regarder 4 dernières
 jouer carte
