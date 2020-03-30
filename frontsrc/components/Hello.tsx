@@ -1,5 +1,24 @@
 import * as React from "react";
+import { useQuery } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
 
-export interface HelloProps { compiler: string; framework: string; }
 
-export const Hello = (props: HelloProps) => <h1>Hello e from {props.compiler} and {props.framework}!</h1>;
+const dataQuery = gql`
+	query {
+		books {
+			title
+			author
+		}
+	}
+`;
+
+export default (props: { compiler: string; framework: string; }) => {
+	const { loading, error, data } = useQuery(dataQuery);
+
+  if (loading) return <p>Loading...</p>;
+	if (error) return <p>Error : {error}</p>;
+		
+	return (
+		<h1>{JSON.stringify(data.books)}</h1>
+	);
+};

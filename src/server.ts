@@ -33,6 +33,13 @@ affichage :
 - winned avec points (sans atouts)
 - lastActions
 
+[7-8JQKA][CDHS]
+C = pique
+D = carreau
+H = coeur
+S = pique
+
+
 
 {
 	lastActions: ["Jérôme à pris le pli"],
@@ -95,7 +102,12 @@ const resolvers = {
 	const dbName = MONGODB_URI.match(/^.*\/([a-zA-Z0-9_]+$)/u)[1];
 	const db = client.db(dbName);
 	
-	const server = new ApolloServer({ typeDefs, resolvers });
+	const server = new ApolloServer({
+		typeDefs,
+		resolvers,
+		playground: true,
+		debug: true,
+	});
 	const graphqlPath = '/graphql';
 
 

@@ -36,9 +36,9 @@ module.exports = (env, argv) => {
 				template: './index.html',
 			}),
 			new CopyPlugin([
-				// react.production.min
 				{ from: './node_modules/react/umd/react.' + (isDev ? 'development' : 'production') + '.js', to: 'react.js' },
 				{ from: './node_modules/react-dom/umd/react-dom.' + (isDev ? 'development' : 'production') + '.js', to: 'react-dom.js' },
+				{ from: './cards/*.png', to: '[name].[ext]' },
 			]),
 		],
 
