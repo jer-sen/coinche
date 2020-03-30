@@ -1,7 +1,9 @@
 import express from 'express';
 import { ObjectID, MongoClient } from 'mongodb';
 import { ApolloServer, gql } from 'apollo-server-express';
-import { join, resolve } from 'path';
+import { resolve, join } from 'path';
+import { readdirSync } from 'fs';
+
 
 /*
 créer partie
@@ -115,13 +117,15 @@ const resolvers = {
 	const PORT = process.env.PORT || 3000;
 	const app = express();
 
-	console.log("aaa", __dirname, resolve('.'));
+	const staticPath = resolve('./frontdist');
+	console.log("aaa", JSON.stringify(readdirSync(staticPath)));
+	console.log("bbb", JSON.stringify(readdirSync(join(staticPath, 'cards'))));
 	
-	app.use('/', express.static(join(__dirname, '../frontdist')));
 	server.applyMiddleware({
 		app: app,
 		path: graphqlPath,
 	});
-	app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`));
+	app.use('/', express.static(staticPath));
+	app.listen(PORT, () => console.log(`Listening on port ${PORT}!`));
 })();
 
