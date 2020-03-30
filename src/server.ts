@@ -118,8 +118,6 @@ const resolvers = {
 	const app = express();
 
 	const staticPath = resolve('./frontdist');
-	console.log("aaa", JSON.stringify(readdirSync(staticPath)));
-	console.log("bbb", JSON.stringify(readdirSync(join(staticPath, 'cards'))));
 	
 	server.applyMiddleware({
 		app: app,
