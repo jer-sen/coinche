@@ -11,9 +11,9 @@ const client = new ApolloClient({
 });
 
 ReactDOM.render(
-    <ApolloProvider client={client}>
-			<Hello compiler="TypeScript" framework="React" />
-			<Card code="8H" />
-		</ApolloProvider>,
-    document.getElementById("example")
+	<ApolloProvider client={client}>
+		<Hello compiler="TypeScript" framework="React" />
+		<Card code="8H" />
+	</ApolloProvider>,
+	document.getElementById("example"),
 );

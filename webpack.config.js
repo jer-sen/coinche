@@ -1,17 +1,17 @@
 const path = require('path');
-const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 
 
 module.exports = (env, argv) => {
 	const isDev = argv.$0.endsWith('webpack-dev-server.js');
-	console.log("MODE DEV : " + isDev);	
+	// eslint-disable-next-line no-console
+	console.log("MODE DEV : " + isDev);
 	return {
 		devServer: {
 			contentBase: path.join(__dirname, 'frontdist'),
 			compress: true,
-			port: 9000
+			port: 9000,
 		},
 		
 		mode: isDev ? 'development' : 'production',
@@ -22,12 +22,12 @@ module.exports = (env, argv) => {
 		entry: './frontsrc/index.tsx',
 		output: {
 			path: path.resolve(__dirname, 'frontdist'),
-			filename: 'main.js'
+			filename: 'main.js',
 		},
 		
 		resolve: {
-				// Add '.ts' and '.tsx' as resolvable extensions.
-				extensions: [".ts", ".tsx", '.js', '.jsx']
+			// Add '.ts' and '.tsx' as resolvable extensions.
+			extensions: [".ts", ".tsx", '.js', '.jsx'],
 		},
 
 		plugins: [
@@ -43,35 +43,32 @@ module.exports = (env, argv) => {
 		],
 
 		module: {
-				rules: [
+			rules: [
+				{
+					test: /\.ts(x?)$/u,
+					exclude: /node_modules/u,
+					use: [
 						{
-								test: /\.ts(x?)$/,
-								exclude: /node_modules/,
-								use: [
-										{
-												loader: "ts-loader",
-												options: {
-													configFile: '../tsconfigFront.json',
-												},
-										}
-								]
+							loader: "ts-loader",
+							options: {
+								configFile: '../tsconfigFront.json',
+							},
 						},
-						// All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-						{
-								enforce: "pre",
-								test: /\.js$/,
-								loader: "source-map-loader"
-						}
-				]
+					],
+				},
+				// All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
+				{
+					enforce: "pre",
+					test: /\.js$/u,
+					loader: "source-map-loader",
+				},
+			],
 		},
 
-		// When importing a module whose path matches one of the following, just
-		// assume a corresponding global variable exists and use that instead.
-		// This is important because it allows us to avoid bundling all of our
-		// dependencies, which allows browsers to cache those libraries between builds.
+		// Importés directement pour éviter d'allourdir la compilation
 		externals: {
 			"react": "React",
-			"react-dom": "ReactDOM"
+			"react-dom": "ReactDOM",
 		},
 	};
 };
