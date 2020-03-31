@@ -118,6 +118,8 @@ module.exports = {
 		'react/jsx-sort-default-props': 'off',
 		'react/jsx-max-depth': 'off',
 		'react/jsx-props-no-spreading': 'off',
+		'react/display-name': 'off',
+		'react/function-component-definition': 'off',
 
 		'import/no-duplicates': 'error',
 		'import/no-cycle': 'error',
