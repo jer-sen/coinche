@@ -361,7 +361,8 @@ export default {
 					winnedCards: null,
 					toDeal: [...gameData.winnedCards[args.firstTeam], ...gameData.winnedCards[(args.firstTeam + 1) % 2]],
 				},
-				$push: { actions: { text: "Jeu reformé par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() } },
+				// eslint-disable-next-line max-len
+				$push: { actions: { text: "Jeu reformé (équipe " + args.firstTeam + " au-dessus) par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() } },
 			});
 			return true;
 		},
