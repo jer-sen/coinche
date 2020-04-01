@@ -266,7 +266,9 @@ export default {
 			const player = gameData.players.findIndex(({ token }) => token === args.token);
 			if (player < 0) throw new Error("Wrong token");
 			if (!gameData.currentTrick) throw new Error("Wrong game state");
-			if (gameData.currentTrick.some((cp) => cp.player === player)) throw new Error("Card already played");
+			if (gameData.currentTrick.some((cp) => cp.player === player)) throw new Error("Already played");
+			if (gameData.currentTrick.length > 0 && gameData.currentTrick[gameData.currentTrick.length - 1].player !== (player + 3) % 4) throw new Error("Not your turn");
+
 			const cardIndex = gameData.hands[player].indexOf(args.card);
 			if (cardIndex < 0) throw new Error("Wrong card");
 			
