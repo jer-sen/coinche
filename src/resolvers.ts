@@ -270,7 +270,10 @@ export default {
 			if (player < 0) throw new Error("Wrong token");
 			if (!gameData.currentTrick) throw new Error("Wrong game state");
 			if (gameData.currentTrick.some((cp) => cp.player === player)) throw new Error("Already played");
-			if (gameData.currentTrick.length > 0 && gameData.currentTrick[gameData.currentTrick.length - 1].player !== (player + 3) % 4) throw new Error("Not your turn");
+			if (
+				gameData.currentTrick.length > 0
+				&& gameData.currentTrick[gameData.currentTrick.length - 1].player !== (player + 3) % 4
+			) throw new Error("Not your turn");
 
 			const cardIndex = gameData.hands[player].indexOf(args.card);
 			if (cardIndex < 0) throw new Error("Wrong card");
@@ -314,7 +317,6 @@ export default {
 					winnedCards: gameData.winnedCards,
 					currentTrick: null,
 					lastTrick: null,
-					toDeal: null,
 				} });
 			}
 			else {
@@ -353,22 +355,33 @@ export default {
 			});
 			return true;
 		},
-		regroup: async (_: any, args: { gameId: string, token: string, firstTeam: number }) => {
+		regroup: async (_: any, args: { gameId: string, token: string, order: number[] }) => {
 			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) }) as GameData | null;
 			if (!gameData) throw new Error("Wrong gameId");
 			const player = gameData.players.findIndex(({ token }) => token === args.token);
 			if (player < 0) throw new Error("Wrong token");
-			if (!gameData.winnedCards || gameData.winnedCards[0].length + gameData.winnedCards[1].length !== 32) throw new Error("Wrong game state");
-			if (![0, 1].includes(args.firstTeam)) throw new Error("Wrong team");
+			if (!Array.isArray(args.order) || ![...args.order].sort().every((o, i) => o === i)) throw new Error("Wrong order");
+
+			const toRegroup = [
+				...(!gameData.winnedCards ? [] : gameData.winnedCards),
+				...(!gameData.hands ? [] : gameData.hands),
+				...(!gameData.currentTrick ? [] : gameData.currentTrick.map((pc) => pc.card)),
+			];
+			if (toRegroup.reduce((acc, cur) => acc + cur.length, 0) !== 32) throw new Error("Wrong game state, not all cards winned or in hands");
+			if (args.order.length !== toRegroup.length) throw new Error("Wrong order length, expected " + toRegroup.length);
 
 			await col.updateOne({ _id: gameData._id }, {
 				$set: {
 					winnedCards: null,
-					toDeal: [...gameData.winnedCards[args.firstTeam], ...gameData.winnedCards[(args.firstTeam + 1) % 2]],
+					hands: null,
+					currentTrick: null,
+					lastTrick: null,
+					toDeal: [].concat(...args.order.map((o) => toRegroup[o])),
 				},
 				// eslint-disable-next-line max-len
-				$push: { actions: { text: "Jeu reformé (équipe " + args.firstTeam + " au-dessus) par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() } },
+				$push: { actions: { text: "Jeu reformé (ordre " + args.order + ") par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() } },
 			});
+
 			return true;
 		},
 	},

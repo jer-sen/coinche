@@ -55,6 +55,6 @@ export default `
 		# true si ok
 		untakeTrick(gameId: ID!, token: String!): Boolean!
 		# true si ok
-		regroup(gameId: ID!, token: String!, firstTeam: Int!): Boolean!
+		regroup(gameId: ID!, token: String!, order: [Int!]!): Boolean!
 	}
 `;

@@ -90,9 +90,9 @@ const untakeTrickMutationDoc = gql`
 	}
 `;
 const regroupMutationDoc = gql`
-	mutation($gameId: ID!, $token: String!, $firstTeam: Int!) {
+	mutation($gameId: ID!, $token: String!, $order: [Int!]!) {
 		# true si ok
-		regroup(gameId: $gameId, token: $token, firstTeam: $firstTeam)
+		regroup(gameId: $gameId, token: $token, order: $order)
 	}
 `;
 
@@ -423,16 +423,16 @@ export default observer(() => {
 	}, [untakeTrickMutation]);
 	const regroup = React.useCallback(async () => {
 		// eslint-disable-next-line no-alert
-		const firstTeamString = prompt("Numéro du tas de l'équipe à mettre au dessus (0 ou 1) :", "0");
-		if (firstTeamString === null) return;
+		const orderString = prompt("Ordre des tas (cartes gagnées, mains, pli en cours) du dessus au dessous :", "[0, 1]");
+		if (orderString === null) return;
 		try {
-			const firstTeam = parseInt(firstTeamString, 10);
-			if (![0, 1].includes(firstTeam)) throw new Error("Numéro d'équipe incorrect");
+			const order = JSON.parse(orderString);
+			if (!Array.isArray(order) || ![...order].sort().every((o, i) => o === i)) throw new Error("Ordre incorrect");
 
 			await regroupMutation({ variables: {
 				gameId: globalStore.gameId,
 				token: globalStore.token,
-				firstTeam,
+				order,
 			} });
 		}
 		catch (err) {
