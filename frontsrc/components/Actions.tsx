@@ -1,6 +1,8 @@
 import * as React from "react";
 import globalStore from "../globalStore";
 import { observer } from "mobx-react";
+// eslint-disable-next-line import/default
+import moment from 'moment-timezone';
 
 
 export default observer(() =>
@@ -13,7 +15,11 @@ export default observer(() =>
 		</ol>
 		<ul>
 			{
-				[...globalStore.actions].reverse().slice(0, 20).map((a: string) => <li key={a}>{a}</li>)
+				[...globalStore.actions].reverse().slice(0, 20).map(
+					(a: { text: string, ticks: number }) =>
+						<li key={a.text} title={moment(a.ticks).format('[ le ]DD/MM/YYYY[ à ]HH:mm:ss')}>{a.text}</li>
+					,
+				)
 			}
 		</ul>
 	</div>,

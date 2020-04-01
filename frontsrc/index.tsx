@@ -1,6 +1,11 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import ApolloClient from 'apollo-boost';
+// eslint-disable-next-line import/default
+import moment from 'moment-timezone';
+
+moment.tz.setDefault("Europe/Paris");
+moment.locale('fr');
 
 import Game from "./components/Game";
 import { ApolloProvider } from '@apollo/react-hooks';

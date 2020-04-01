@@ -21,7 +21,10 @@ const dataQuery = gql`
 				card
 			}
 			winnedCards
-			actions
+			actions {
+				text
+				ticks
+			}
 			backColor
 		}
 	}

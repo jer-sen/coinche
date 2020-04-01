@@ -4,6 +4,11 @@ export default `
 		card: String!
 	}
 
+	type Action {
+		text: String!
+		ticks: Int!
+	}
+
 	type Game {
 		id: ID!
 		player: Int!
@@ -11,7 +16,7 @@ export default `
 		hand: [String!]
 		currentTrick: [CardPlayed!]
 		winnedCards: [[String!]!]
-		actions: [String!]!
+		actions: [Action!]!
 		backColor: String!
 	}
 
