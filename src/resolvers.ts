@@ -103,7 +103,7 @@ export default {
 				currentTrick: null,
 				lastTrick: null,
 				toDeal: [...cardSet],
-				actions: [{ text: "Partie créée", ticks: Date.now(), ticks: Date.now() }],
+				actions: [{ text: "Partie créée", ticks: Date.now() }],
 				backColor: 'blue',
 			});
 			return res.insertedId;
@@ -117,6 +117,7 @@ export default {
 			players[args.player].token = token;
 			await col.updateOne({ _id: gameData._id }, {
 				$set: { players: players },
+				// eslint-disable-next-line max-len
 				$push: { actions: { text: "Nouveau joueur " + ('"' + (gameData.players[args.player].name || "joueur " + args.player) + '"'), ticks: Date.now() } },
 			});
 			return token;
@@ -130,6 +131,7 @@ export default {
 
 			await col.updateOne({ _id: gameData._id }, {
 				$set: { backColor: args.color },
+				// eslint-disable-next-line max-len
 				$push: { actions: { text: "Nouvelle couleur choisie par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() } },
 			});
 			return true;
@@ -233,6 +235,7 @@ export default {
 			if (player < 0) throw new Error("Wrong token");
 			
 			await col.updateOne({ _id: gameData._id }, {
+				// eslint-disable-next-line max-len
 				$push: { actions: { text: ('"' + (gameData.players[player].name || "joueur " + player) + '"') + " a regardé le dernier pli", ticks: Date.now() } },
 			});
 			return gameData.lastTrick;
