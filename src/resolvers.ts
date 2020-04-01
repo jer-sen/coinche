@@ -2,6 +2,9 @@
 // eslint-disable-next-line no-unused-vars
 import { ObjectID, MongoClient, Collection } from 'mongodb';
 
+// eslint-disable-next-line import/default
+import moment from 'moment-timezone';
+import { Kind, GraphQLScalarType } from 'graphql';
 
 let col: Collection<any> | null = null;
 export const initializeCollection = async () => {
@@ -74,6 +77,23 @@ const makeid = (length: number) => {
 };
 
 export default {
+	Date: new GraphQLScalarType({
+		name: 'Date',
+		description: 'Date and time',
+		serialize: function(value: number) { // Transformation avant envoi au client
+			return moment(value).valueOf();
+		},
+		parseValue: function(value: number) { // Transformation d'une valeur de variable reçue du client
+			return new Date(value);
+		},
+		parseLiteral: function(ast) { // Transformation d'une valeur incluse dans la requête du client
+			if (ast.kind === Kind.INT) {
+				return new Date(parseInt(ast.value, 10));
+			}
+			return null;
+		},
+	}),
+
 	Query: {
 		game: async (_: any, args: { id: string, token: string }) => {
 			const gameData = await col.findOne({ _id: new ObjectID(args.id) }) as GameData | null;

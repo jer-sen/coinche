@@ -3,6 +3,11 @@ import express from 'express';
 import { ApolloServer, gql } from 'apollo-server-express';
 import schema from './schema';
 import resolvers, { initializeCollection } from './resolvers';
+// eslint-disable-next-line import/default
+import moment from 'moment-timezone';
+
+moment.tz.setDefault("Europe/Paris");
+moment.locale('fr');
 
 
 (async () => {

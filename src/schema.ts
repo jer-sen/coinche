@@ -1,4 +1,6 @@
 export default `
+	scalar Date
+
 	type CardPlayed {
 		player: Int!
 		card: String!
@@ -6,7 +8,7 @@ export default `
 
 	type Action {
 		text: String!
-		ticks: Int!
+		ticks: Date!
 	}
 
 	type Game {
