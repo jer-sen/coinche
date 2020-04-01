@@ -5,5 +5,5 @@ export default (
 	{ isBack = false, color, code = '', onClick, style }
 	: { isBack?: boolean, color: string, code?: string, style: React.CSSProperties, onClick?: () => void | undefined },
 ) =>
-	<img src={isBack ? color + '_back.png' : code + '.png'} style={style} onClick={onClick} />
+	<img src={(isBack ? color + '_back.png' : code + '.png') + window.location.search} style={style} onClick={onClick} />
 ;
