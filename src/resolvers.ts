@@ -237,13 +237,26 @@ export default {
 			if (!gameData.hands) throw new Error("Wrong game state");
 			if (args.trump !== null && !suits.includes(args.trump)) throw new Error("Wrong trump");
 			
-			let lastColor: number | null = null; // 0 = red, 1 = black
+			// 0 = red, 1 = black
 			const getCardColor = (card: string) => ({ H: 0, D: 0, C: 1, S: 1 } as any)[card.substr(-1)];
-
+			
 			const playerHand = gameData.hands[player];
+			const suitsInHand = playerHand.reduce((acc, cur) => {
+				const suit = cur.substr(-1);
+				if (!acc.includes(suit)) acc.push(suit);
+				return acc;
+			}, []);
+			const nbColors = [0, 1].map((c) => suitsInHand.reduce((acc, cur) => acc + (getCardColor(cur) === c ? 1 : 0), 0));
+			let lastColor: number | null =
+				nbColors[0] === nbColors[1] ?
+					null
+					:
+					nbColors.indexOf(Math.min(...nbColors))
+			;
+
 			const newPlayerHand: string[] = [];
 			while (playerHand.length > 0) {
-				// On cherche la couleur (symbole) suivante
+				// On cherche le symbol suivant
 				const suit = (playerHand.find((c) => getCardColor(c) !== lastColor) || playerHand[0]).substr(-1);
 
 				const cards = [];
@@ -390,7 +403,7 @@ export default {
 			const toRegroup = [
 				...(!gameData.winnedCards ? [] : gameData.winnedCards),
 				...(!gameData.hands ? [] : gameData.hands),
-				...(!gameData.currentTrick ? [] : gameData.currentTrick.map((pc) => pc.card)),
+				...(!gameData.currentTrick ? [] : [gameData.currentTrick.map((pc) => pc.card)]),
 			];
 			if (toRegroup.reduce((acc, cur) => acc + cur.length, 0) !== 32) throw new Error("Wrong game state, not all cards winned or in hands");
 			if (args.order.length !== toRegroup.length) throw new Error("Wrong order length, expected " + toRegroup.length);
@@ -404,7 +417,7 @@ export default {
 					toDeal: [].concat(...args.order.map((o) => toRegroup[o])),
 				},
 				// eslint-disable-next-line max-len
-				$push: { actions: { text: "Jeu reformé (ordre " + args.order + ") par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() } },
+				$push: { actions: { text: "Jeu reformé (ordre " + JSON.stringify(args.order) + ") par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() } },
 			});
 
 			return true;
