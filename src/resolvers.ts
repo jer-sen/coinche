@@ -110,6 +110,7 @@ export default {
 				winnedCards: gameData.winnedCards,
 				actions: gameData.actions,
 				backColor: gameData.backColor,
+				lastDealer: gameData.lastDealer,
 			};
 		},
 	},
@@ -125,6 +126,7 @@ export default {
 				toDeal: [...cardSet],
 				actions: [{ text: "Partie créée", ticks: Date.now() }],
 				backColor: 'blue',
+				lastDealer: null,
 			});
 			return res.insertedId;
 		},
@@ -211,7 +213,7 @@ export default {
 				args.by.length !== 3
 				|| args.by.some((nb) => nb !== 3 && nb !== 2)
 				|| args.by.reduce((acc, cur) => acc + cur, 0) !== 8
-			) throw new Error("Wrong split");
+			) throw new Error("Wrong split, try more in the middle");
 			
 			const hands: string[][] = [[], [], [], []];
 			args.by.forEach((nb: number) => {
@@ -220,7 +222,7 @@ export default {
 				}
 			});
 			await col.updateOne({ _id: gameData._id }, {
-				$set: { toDeal: null, hands, currentTrick: [], winnedCards: [[], []] },
+				$set: { toDeal: null, hands, currentTrick: [], winnedCards: [[], []], lastDealer: player },
 				// eslint-disable-next-line max-len
 				$push: { actions: { text: "Cartes distribuées en " + JSON.stringify(args.by) + " par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() } },
 			});

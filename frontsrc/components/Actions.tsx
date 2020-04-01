@@ -10,7 +10,7 @@ export default observer(() =>
 		<ol start={0} >
 			{
 				// eslint-disable-next-line react/no-array-index-key
-				globalStore.players.map((p: string, i: number) => <li key={i}>{p}</li>)
+				globalStore.players.map((p: string, i: number) => <li key={i}>{globalStore.lastDealer === i ? <b>{p}</b> : p}</li>)
 			}
 		</ol>
 		<ul>

@@ -107,7 +107,7 @@ const cardSet = [
 
 const getCardName = (card: string) => (
 	(({
-		J: 'vallet',
+		J: 'valet',
 		Q: 'dame',
 		K: 'roi',
 		A: 'as',

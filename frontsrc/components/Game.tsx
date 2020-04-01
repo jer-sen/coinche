@@ -26,6 +26,7 @@ const dataQuery = gql`
 				ticks
 			}
 			backColor
+			lastDealer
 		}
 	}
 `;
@@ -88,6 +89,7 @@ export default observer(() => {
 		if (!data) return;
 		globalStore.actions = data.game.actions;
 		globalStore.players = data.game.players;
+		globalStore.lastDealer = data.game.lastDealer;
 	}), [data]);
 
 	if (loading) return <p>Loading...</p>;

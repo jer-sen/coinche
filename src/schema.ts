@@ -20,6 +20,7 @@ export default `
 		winnedCards: [[String!]!]
 		actions: [Action!]!
 		backColor: String!
+		lastDealer: Int
 	}
 
 	type Query {
