@@ -290,6 +290,19 @@ export default observer(() => {
 			alert("Erreur : " + err);
 		}
 	}, [sortHandMutation]);
+	const sortHandH = React.useCallback(async () => {
+		try {
+			await sortHandMutation({ variables: {
+				gameId: globalStore.gameId,
+				token: globalStore.token,
+				trump: 'H',
+			} });
+		}
+		catch (err) {
+			// eslint-disable-next-line no-alert
+			alert("Erreur : " + err);
+		}
+	}, [sortHandMutation]);
 	const sortHandC = React.useCallback(async () => {
 		try {
 			await sortHandMutation({ variables: {
@@ -309,19 +322,6 @@ export default observer(() => {
 				gameId: globalStore.gameId,
 				token: globalStore.token,
 				trump: 'D',
-			} });
-		}
-		catch (err) {
-			// eslint-disable-next-line no-alert
-			alert("Erreur : " + err);
-		}
-	}, [sortHandMutation]);
-	const sortHandH = React.useCallback(async () => {
-		try {
-			await sortHandMutation({ variables: {
-				gameId: globalStore.gameId,
-				token: globalStore.token,
-				trump: 'H',
 			} });
 		}
 		catch (err) {
@@ -465,11 +465,11 @@ export default observer(() => {
 				<div>Trier mes cartes :</div>
 				<Button text="Sans atout" onClick={sortHand} />
 				<div>
+					<Button text="Coeur" onClick={sortHandH} small={true} />
 					<Button text="Trèfle" onClick={sortHandC} small={true} />
-					<Button text="Carreau" onClick={sortHandD} small={true} />
 				</div>
 				<div>
-					<Button text="Coeur" onClick={sortHandH} small={true} />
+					<Button text="Carreau" onClick={sortHandD} small={true} />
 					<Button text="Pique" onClick={sortHandS} small={true} />
 				</div>
 				<br />
