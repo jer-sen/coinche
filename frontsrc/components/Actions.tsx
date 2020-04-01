@@ -16,8 +16,9 @@ export default observer(() =>
 		<ul>
 			{
 				[...globalStore.actions].reverse().slice(0, 20).map(
-					(a: { text: string, ticks: number }) =>
-						<li key={a.text} title={moment(a.ticks).format('[ le ]DD/MM/YYYY[ à ]HH:mm:ss')}>{a.text}</li>
+					(a: { text: string, ticks: number }, i: number) =>
+						// eslint-disable-next-line react/no-array-index-key
+						<li key={i} title={moment(a.ticks).format('[ le ]DD/MM/YYYY[ à ]HH:mm:ss')}>{a.text}</li>
 					,
 				)
 			}
