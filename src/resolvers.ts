@@ -17,9 +17,9 @@ export const initializeCollection = async () => {
 
 /*
 	[7-10JQKA][CDHS]
+	H = coeur
 	C = trefle
 	D = carreau
-	H = coeur
 	S = pique
 */
 const cardSet = [
@@ -29,7 +29,7 @@ const cardSet = [
 	'7S', '8S', '9S', '10S', 'JS', 'QS', 'KS', 'AS',
 ];
 
-const suits = ['C', 'D', 'H', 'S'];
+const suits = ['H', 'C', 'D', 'S'];
 const sortedCardNumbersNotTrump = ['7', '8', '9', 'J', 'Q', 'K', '10', 'A'];
 const sortedCardNumbersTrump = ['7', '8', 'Q', 'K', '10', 'A', '9', 'J'];
 
