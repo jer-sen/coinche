@@ -46,6 +46,7 @@ interface GameData {
 	toDeal: string[] | null
 	actions: { text: string, ticks: number }[]
 	backColor: string
+	lastDealer: number | null
 }
 
 const shuffle = (array: string[]) => {
