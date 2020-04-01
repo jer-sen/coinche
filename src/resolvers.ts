@@ -235,16 +235,41 @@ export default {
 			const player = gameData.players.findIndex(({ token }) => token === args.token);
 			if (player < 0) throw new Error("Wrong token");
 			if (!gameData.hands) throw new Error("Wrong game state");
+			if (args.trump !== null && !suits.includes(args.trump)) throw new Error("Wrong trump");
 			
-			gameData.hands[player].sort((a, b) => {
-				const aSuit = a.charAt(a.length - 1);
-				const bSuit = b.charAt(b.length - 1);
-				const aValue = a.substring(0, a.length - 1);
-				const bValue = b.substring(0, b.length - 1);
-				if (aSuit !== bSuit) return suits.indexOf(aSuit) - suits.indexOf(bSuit);
-				if (aSuit === args.trump) return sortedCardNumbersTrump.indexOf(aValue) - sortedCardNumbersTrump.indexOf(bValue);
-				return sortedCardNumbersNotTrump.indexOf(aValue) - sortedCardNumbersNotTrump.indexOf(bValue);
-			});
+			let lastColor: number | null = null; // 0 = red, 1 = black
+			const getCardColor = (card: string) => ({ H: 0, D: 0, C: 1, S: 1 } as any)[card.substr(-1)];
+
+			const playerHand = gameData.hands[player];
+			const newPlayerHand: string[] = [];
+			while (playerHand.length > 0) {
+				// On cherche la couleur (symbole) suivante
+				const suit = (playerHand.find((c) => getCardColor(c) !== lastColor) || playerHand[0]).substr(-1);
+
+				const cards = [];
+				// eslint-disable-next-line no-constant-condition
+				while (true) {
+					const nextCardIndex = playerHand.findIndex((c) => c.substr(-1) === suit);
+					if (nextCardIndex < 0) break;
+					cards.push(...playerHand.splice(nextCardIndex, 1));
+				}
+
+				cards.sort((a, b) => {
+					const aSuit = a.substr(-1);
+					const bSuit = b.substr(-1);
+					const aValue = a.substring(0, a.length - 1);
+					const bValue = b.substring(0, b.length - 1);
+					if (aSuit !== bSuit) throw new Error("Not same suit");
+					if (aSuit === args.trump) return sortedCardNumbersTrump.indexOf(aValue) - sortedCardNumbersTrump.indexOf(bValue);
+					return sortedCardNumbersNotTrump.indexOf(aValue) - sortedCardNumbersNotTrump.indexOf(bValue);
+				});
+
+				newPlayerHand.push(...cards);
+
+				lastColor = getCardColor(newPlayerHand[newPlayerHand.length - 1]);
+			}
+			gameData.hands[player] = newPlayerHand;
+
 			await col.updateOne({ _id: gameData._id }, {
 				$set: { hands: gameData.hands },
 				$push: { actions: { text: ('"' + (gameData.players[player].name || "joueur " + player) + '"') + " a trié ses cartes", ticks: Date.now() } },
