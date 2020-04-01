@@ -45,9 +45,9 @@ const cutMutationDoc = gql`
 	}
 `;
 const dealMutationDoc = gql`
-	mutation($gameId: ID!, $token: String!, $by: [Int!]!) {
+	mutation($gameId: ID!, $token: String!, $by: [Int!]!, $firstPlayer: Int!) {
 		# true si ok
-		deal(gameId: $gameId, token: $token, by: $by)
+		deal(gameId: $gameId, token: $token, by: $by, firstPlayer: $firstPlayer)
 	}
 `;
 const sortHandMutationDoc = gql`
@@ -258,6 +258,9 @@ export default observer(() => {
 		// eslint-disable-next-line no-alert
 		const byString = prompt("Par combien ?", "[3, 2, 3]");
 		if (byString === null) return;
+		// eslint-disable-next-line no-alert
+		const firstPlayerString = prompt("En commençant par le joueur numéro ?", globalStore.player === null ? '' : String((globalStore.player + 1) % 4));
+		if (firstPlayerString === null) return;
 		try {
 			const by = JSON.parse(byString);
 			if (
@@ -266,10 +269,14 @@ export default observer(() => {
 			|| by.reduce((acc, cur) => acc + cur, 0) !== 8
 			) throw new Error("Répartition incorrecte");
 
+			const firstPlayer = parseInt(firstPlayerString, 10);
+			if (![0, 1, 2, 3].includes(firstPlayer)) throw new Error("Numéro de joueur incorrect");
+
 			await dealMutation({ variables: {
 				gameId: globalStore.gameId,
 				token: globalStore.token,
 				by,
+				firstPlayer,
 			} });
 		}
 		catch (err) {

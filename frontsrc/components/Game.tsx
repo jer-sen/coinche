@@ -90,6 +90,7 @@ export default observer(() => {
 		globalStore.actions = data.game.actions;
 		globalStore.players = data.game.players;
 		globalStore.lastDealer = data.game.lastDealer;
+		globalStore.player = data.game.player;
 	}), [data]);
 
 	if (loading) return <p>Loading...</p>;

@@ -41,7 +41,7 @@ export default `
 		# true si ok
 		cut(gameId: ID!, token: String!, wherePercentage: Float!): Boolean!
 		# true si ok
-		deal(gameId: ID!, token: String!, by: [Int!]!): Boolean!
+		deal(gameId: ID!, token: String!, by: [Int!]!, firstPlayer: Int!): Boolean!
 		# true si ok
 		sortHand(gameId: ID!, token: String!, trump: String): Boolean!
 		# true si ok

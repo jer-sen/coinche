@@ -6,6 +6,7 @@ const globalStore = observable({
 	actions: [],
 	players: [],
 	lastDealer: null,
+	player: null,
 });
 
 autorun(() => {

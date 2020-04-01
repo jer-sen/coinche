@@ -204,7 +204,7 @@ export default {
 			});
 			return true;
 		},
-		deal: async (_: any, args: { gameId: string, token: string, by: number[] }) => {
+		deal: async (_: any, args: { gameId: string, token: string, by: number[], firstPlayer: number }) => {
 			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) }) as GameData | null;
 			if (!gameData) throw new Error("Wrong gameId");
 			const player = gameData.players.findIndex(({ token }) => token === args.token);
@@ -218,8 +218,8 @@ export default {
 			
 			const hands: string[][] = [[], [], [], []];
 			args.by.forEach((nb: number) => {
-				for (let i = player + 1; i <= player + 4; i++) {
-					hands[i % 4].push(...gameData.toDeal.splice(0, nb));
+				for (let i = args.firstPlayer + 1; i <= args.firstPlayer + 4; i++) {
+					hands[i % 4] = [...gameData.toDeal.splice(0, nb), ...hands[i % 4]];
 				}
 			});
 			await col.updateOne({ _id: gameData._id }, {
