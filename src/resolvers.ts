@@ -88,7 +88,6 @@ export default {
 				id: gameData._id.toHexString(),
 				player,
 				players: gameData.players.map(({ name }) => name),
-				handsCardsNumber: gameData.hands && gameData.hands.map((h) => h.length),
 				hand: gameData.hands && gameData.hands[player],
 				currentTrick: gameData.currentTrick,
 				winnedCards: gameData.winnedCards,
@@ -197,9 +196,9 @@ export default {
 			
 			const hands: string[][] = [[], [], [], []];
 			args.by.forEach((nb: number) => {
-				hands.forEach((h) => {
-					h.push(...gameData.toDeal.splice(0, nb));
-				});
+				for (let i = player + 1; i <= player + 4; i++) {
+					hands[i % 4].push(...gameData.toDeal.splice(0, nb));
+				}
 			});
 			await col.updateOne({ _id: gameData._id }, {
 				$set: { toDeal: null, hands, currentTrick: [], winnedCards: [[], []] },
@@ -284,7 +283,7 @@ export default {
 			if (player < 0) throw new Error("Wrong token");
 			if (!gameData.currentTrick || gameData.currentTrick.length !== 4) throw new Error("Wrong game state");
 
-			gameData.winnedCards[player % 2].push(...gameData.currentTrick.map((pc) => pc.card));
+			gameData.winnedCards[player % 2] = [...gameData.currentTrick.map((pc) => pc.card), ...gameData.winnedCards[player % 2]];
 			if (gameData.hands.every((h) => h.length === 0)) {
 				// Partie finie
 				await col.updateOne({ _id: gameData._id }, { $set: {

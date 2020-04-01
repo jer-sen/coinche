@@ -15,7 +15,6 @@ const dataQuery = gql`
 			id
 			player
 			players
-			handsCardsNumber
 			hand
 			currentTrick {
 				player
@@ -85,6 +84,7 @@ export default observer(() => {
 	React.useEffect(action(() => {
 		if (!data) return;
 		globalStore.actions = data.game.actions;
+		globalStore.players = data.game.players;
 	}), [data]);
 
 	if (loading) return <p>Loading...</p>;

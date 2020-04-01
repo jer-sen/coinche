@@ -4,6 +4,7 @@ const globalStore = observable({
 	gameId: JSON.parse(localStorage.getItem('gameId') || 'null'),
 	token: JSON.parse(localStorage.getItem('token') || 'null'),
 	actions: [],
+	players: [],
 });
 
 autorun(() => {

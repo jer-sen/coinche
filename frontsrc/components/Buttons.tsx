@@ -117,7 +117,7 @@ const getCardName = (card: string) => (
 		D: "carreau",
 		H: "coeur",
 		S: "pique",
-	} as any)[card.substring(0, card.length - 1)]
+	} as any)[card.charAt(card.length - 1)]
 );
 
 const style = {
@@ -353,7 +353,11 @@ export default observer(() => {
 				!res.data.lookLastTrick ?
 					"Pas de dernier pli"
 					:
-					res.data.lookLastTrick.map((pc: { player: number, card: string }) => getCardName(pc.card) + " jouée par le joueur " + pc.player).join('\n')
+					res.data.lookLastTrick.map(
+						(pc: { player: number, card: string }) =>
+							getCardName(pc.card) + " jouée par " + (globalStore.players[pc.player] || "le joueur " + pc.player)
+						,
+					).join('\n')
 				,
 			);
 		}

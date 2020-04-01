@@ -8,7 +8,6 @@ export default `
 		id: ID!
 		player: Int!
 		players: [String]!
-		handsCardsNumber: [Int!]
 		hand: [String!]
 		currentTrick: [CardPlayed!]
 		winnedCards: [[String!]!]
