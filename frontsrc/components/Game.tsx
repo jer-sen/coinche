@@ -6,8 +6,28 @@ import { observer } from "mobx-react";
 import globalStore from "../globalStore";
 import Card from "./Card";
 import { action } from "mobx";
+import Button from "./Button";
+import { regroupMutationDoc } from "./Buttons";
 
 
+const shuffleMutationDoc = gql`
+	mutation($gameId: ID!, $token: String!) {
+		# true si ok
+		shuffle(gameId: $gameId, token: $token)
+	}
+`;
+const cutMutationDoc = gql`
+	mutation($gameId: ID!, $token: String!, $wherePercentage: Float!) {
+		# true si ok
+		cut(gameId: $gameId, token: $token, wherePercentage: $wherePercentage)
+	}
+`;
+const dealMutationDoc = gql`
+	mutation($gameId: ID!, $token: String!, $by: [Int!]!, $firstPlayer: Int!) {
+		# true si ok
+		deal(gameId: $gameId, token: $token, by: $by, firstPlayer: $firstPlayer)
+	}
+`;
 const playCardMutationDoc = gql`
 	mutation($gameId: ID!, $token: String!, $card: String!) {
 		# true si ok
@@ -19,6 +39,14 @@ const takeTrickMutationDoc = gql`
 	mutation($gameId: ID!, $token: String!) {
 		# true si ok
 		takeTrick(gameId: $gameId, token: $token)
+	}
+`;
+
+
+const sortHandMutationDoc = gql`
+	mutation($gameId: ID!, $token: String!, $trump: String) {
+		# true si ok
+		sortHand(gameId: $gameId, token: $token, trump: $trump)
 	}
 `;
 
@@ -69,9 +97,93 @@ export default observer(() => {
 		pollInterval: skip ? undefined : 1000,
 	});
 
+	const [regroupMutation] = useMutation(regroupMutationDoc);
+	const [shuffleMutation] = useMutation(shuffleMutationDoc);
+	const [cutMutation] = useMutation(cutMutationDoc);
+	const [dealMutation] = useMutation(dealMutationDoc);
 	const [playCardMutation] = useMutation(playCardMutationDoc);
 	const [takeTrickMutation] = useMutation(takeTrickMutationDoc);
+	const [sortHandMutation] = useMutation(sortHandMutationDoc);
 
+	
+	const regroup = React.useCallback(async () => {
+		// eslint-disable-next-line no-alert
+		const orderString = prompt("Ordre des tas (cartes gagnées, mains, pli en cours) du dessus au dessous :", "[0, 1]");
+		if (orderString === null) return;
+		try {
+			const order = JSON.parse(orderString);
+			if (!Array.isArray(order) || ![...order].sort().every((o, i) => o === i)) throw new Error("Ordre incorrect");
+
+			await regroupMutation({ variables: {
+				gameId: globalStore.gameId,
+				token: globalStore.token,
+				order,
+			} });
+			if (globalStore.refetch) await globalStore.refetch();
+		}
+		catch (err) {
+			// eslint-disable-next-line no-alert
+			alert("Erreur : " + err);
+		}
+	}, [regroupMutation]);
+	const shuffle = React.useCallback(async () => {
+		try {
+			await shuffleMutation({ variables: {
+				gameId: globalStore.gameId,
+				token: globalStore.token,
+			} });
+			if (globalStore.refetch) await globalStore.refetch();
+		}
+		catch (err) {
+			// eslint-disable-next-line no-alert
+			alert("Erreur : " + err);
+		}
+	}, [shuffleMutation]);
+	const cut = React.useCallback(async (cardIndex: number) => {
+		try {
+			await cutMutation({ variables: {
+				gameId: globalStore.gameId,
+				token: globalStore.token,
+				wherePercentage: (cardIndex / 31) * 100,
+			} });
+			if (globalStore.refetch) await globalStore.refetch();
+		}
+		catch (err) {
+			// eslint-disable-next-line no-alert
+			alert("Erreur : " + err);
+		}
+	}, [cutMutation]);
+	const deal = React.useCallback(async () => {
+		// eslint-disable-next-line no-alert
+		const byString = prompt("Par combien ?", "[3, 2, 3]");
+		if (byString === null) return;
+		// eslint-disable-next-line no-alert
+		const firstPlayerString = prompt("En commençant par le joueur numéro ?", globalStore.player === null ? '' : String((globalStore.player + 1) % 4));
+		if (firstPlayerString === null) return;
+		try {
+			const by = JSON.parse(byString);
+			if (
+				!by || !Array.isArray(by) || by.length !== 3
+				|| by.some((nb) => nb !== 3 && nb !== 2)
+			|| by.reduce((acc, cur) => acc + cur, 0) !== 8
+			) throw new Error("Répartition incorrecte");
+
+			const firstPlayer = parseInt(firstPlayerString, 10);
+			if (![0, 1, 2, 3].includes(firstPlayer)) throw new Error("Numéro de joueur incorrect");
+
+			await dealMutation({ variables: {
+				gameId: globalStore.gameId,
+				token: globalStore.token,
+				by,
+				firstPlayer,
+			} });
+			if (globalStore.refetch) await globalStore.refetch();
+		}
+		catch (err) {
+			// eslint-disable-next-line no-alert
+			alert("Erreur : " + err);
+		}
+	}, [dealMutation]);
 	const playCard = React.useCallback(async (card) => {
 		try {
 			await playCardMutation({ variables: {
@@ -99,6 +211,20 @@ export default observer(() => {
 			alert("Erreur : " + err);
 		}
 	}, [takeTrickMutation]);
+	const sortHand = React.useCallback(async (trump: string | null) => {
+		try {
+			await sortHandMutation({ variables: {
+				gameId: globalStore.gameId,
+				token: globalStore.token,
+				trump,
+			} });
+			if (globalStore.refetch) await globalStore.refetch();
+		}
+		catch (err) {
+			// eslint-disable-next-line no-alert
+			alert("Erreur : " + err);
+		}
+	}, [sortHandMutation]);
 
 	React.useEffect(action(() => {
 		if (!data) return;
@@ -135,6 +261,8 @@ export default observer(() => {
 											isBack={true}
 											color={data.game.backColor}
 											key={c}
+											onClick={cut}
+											onClickArg={i}
 											style={{
 												width: '100px',
 												position: 'absolute',
@@ -144,9 +272,17 @@ export default observer(() => {
 										/>,
 									)
 								}
+								<div style={{ top: '160px', position: 'absolute' }}>
+									<span>Cliquez sur une carte pas trop extrême pour couper le jeu près de celle-ci (aléa entre +/-3 cartes ajouté)</span>
+									<div>
+										<Button text="Mélanger" onClick={shuffle} />
+										<Button text="Distribuer" onClick={deal} />
+									</div>
+								</div>
 							</div>
 							:
 							<div style={{ height: '404px', width: ((31 * 20) + 100) + 'px', position: 'relative' }}>
+								<Button text="Reformer me jeu" onClick={regroup} />
 								{
 									[0, 1].map((team) =>
 										data.game.winnedCards[team].map((c: string, i: number) =>
@@ -202,16 +338,16 @@ export default observer(() => {
 										,
 									)
 								}
-								<div style={{ position: 'absolute', left: '-200px', top: '120px', fontSize: '30px', width: '400px', textAlign: 'center' }}>
+								<div style={{ position: 'absolute', left: '-100px', top: '120px', fontSize: '25px', width: '150px', textAlign: 'center' }}>
 									{data.game.players[(data.game.player + 0) % 4] || "joueur " + ((data.game.player + 0) % 4)}
 								</div>
-								<div style={{ position: 'absolute', left: '-550px', top: '-15px', fontSize: '30px', width: '400px', textAlign: 'right' }}>
+								<div style={{ position: 'absolute', left: '-260px', top: '-15px', fontSize: '25px', width: '150px', textAlign: 'right' }}>
 									{data.game.players[(data.game.player + 1) % 4] || "joueur " + ((data.game.player + 1) % 4)}
 								</div>
-								<div style={{ position: 'absolute', left: '-200px', top: '-150px', fontSize: '30px', width: '400px', textAlign: 'center' }}>
+								<div style={{ position: 'absolute', left: '-100px', top: '-150px', fontSize: '25px', width: '150px', textAlign: 'center' }}>
 									{data.game.players[(data.game.player + 2) % 4] || "joueur " + ((data.game.player + 2) % 4)}
 								</div>
-								<div style={{ position: 'absolute', left: '150px', top: '-15px', fontSize: '30px', width: '400px', textAlign: 'left' }}>
+								<div style={{ position: 'absolute', left: '110px', top: '-15px', fontSize: '25px', width: '150px', textAlign: 'left' }}>
 									{data.game.players[(data.game.player + 3) % 4] || "joueur " + ((data.game.player + 3) % 4)}
 								</div>
 								{
@@ -227,6 +363,27 @@ export default observer(() => {
 										/>,
 									)
 								}
+								<div
+									style={{
+										top: '350px',
+										left: '-260px',
+										width: '520px',
+										position: 'absolute',
+										alignItems: 'center',
+										display: 'flex',
+										flexDirection: 'column',
+									}}
+								>
+									<div style={{ margin: '10px' }}>Cliquez sur une carte pour la jouer et sur le pli pour le prendre</div>
+									<div>
+										{"Trier : "}
+										<Button text="Sans atout" onClick={sortHand} onClickArg={null} />
+										<Button text="Coeur" onClick={sortHand} small={true} onClickArg='H' />
+										<Button text="Trèfle" onClick={sortHand} small={true} onClickArg='C' />
+										<Button text="Carreau" onClick={sortHand} small={true} onClickArg='D' />
+										<Button text="Pique" onClick={sortHand} small={true} onClickArg='S' />
+									</div>
+								</div>
 							</div>
 						)
 

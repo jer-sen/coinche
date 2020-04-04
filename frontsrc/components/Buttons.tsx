@@ -32,30 +32,6 @@ const setPlayerNameMutationDoc = gql`
 		setPlayerName(gameId: $gameId, token: $token, name: $name)
 	}
 `;
-const shuffleMutationDoc = gql`
-	mutation($gameId: ID!, $token: String!) {
-		# true si ok
-		shuffle(gameId: $gameId, token: $token)
-	}
-`;
-const cutMutationDoc = gql`
-	mutation($gameId: ID!, $token: String!, $wherePercentage: Float!) {
-		# true si ok
-		cut(gameId: $gameId, token: $token, wherePercentage: $wherePercentage)
-	}
-`;
-const dealMutationDoc = gql`
-	mutation($gameId: ID!, $token: String!, $by: [Int!]!, $firstPlayer: Int!) {
-		# true si ok
-		deal(gameId: $gameId, token: $token, by: $by, firstPlayer: $firstPlayer)
-	}
-`;
-const sortHandMutationDoc = gql`
-	mutation($gameId: ID!, $token: String!, $trump: String) {
-		# true si ok
-		sortHand(gameId: $gameId, token: $token, trump: $trump)
-	}
-`;
 const lookLastTrickMutationDoc = gql`
 	mutation($gameId: ID!, $token: String!) {
 		# true si ok
@@ -78,7 +54,7 @@ const untakeTrickMutationDoc = gql`
 		untakeTrick(gameId: $gameId, token: $token)
 	}
 `;
-const regroupMutationDoc = gql`
+export const regroupMutationDoc = gql`
 	mutation($gameId: ID!, $token: String!, $order: [Int!]!) {
 		# true si ok
 		regroup(gameId: $gameId, token: $token, order: $order)
@@ -114,10 +90,6 @@ export default observer(() => {
 	const [joinGameMutation] = useMutation(joinGameMutationDoc);
 	const [setBackColorMutation] = useMutation(setBackColorMutationDoc);
 	const [setPlayerNameMutation] = useMutation(setPlayerNameMutationDoc);
-	const [shuffleMutation] = useMutation(shuffleMutationDoc);
-	const [cutMutation] = useMutation(cutMutationDoc);
-	const [dealMutation] = useMutation(dealMutationDoc);
-	const [sortHandMutation] = useMutation(sortHandMutationDoc);
 	const [lookLastTrickMutation] = useMutation(lookLastTrickMutationDoc);
 	const [unplayCardMutation] = useMutation(unplayCardMutationDoc);
 	const [untakeTrickMutation] = useMutation(untakeTrickMutationDoc);
@@ -207,84 +179,6 @@ export default observer(() => {
 			alert("Erreur : " + err);
 		}
 	}, [setPlayerNameMutation]);
-	const shuffle = React.useCallback(async () => {
-		try {
-			await shuffleMutation({ variables: {
-				gameId: globalStore.gameId,
-				token: globalStore.token,
-			} });
-			if (globalStore.refetch) await globalStore.refetch();
-		}
-		catch (err) {
-			// eslint-disable-next-line no-alert
-			alert("Erreur : " + err);
-		}
-	}, [shuffleMutation]);
-	const cut = React.useCallback(async () => {
-		// eslint-disable-next-line no-alert
-		const wherePercentageString = prompt("A quel pourcentage du haut (0-100) ? Un aléa entre -3 et + 3 cartes sera ajouté.");
-		if (wherePercentageString === null) return;
-		try {
-			const wherePercentage = parseFloat(wherePercentageString);
-			if (isNaN(wherePercentage) || wherePercentage < 0 || wherePercentage > 100) throw new Error("Pourcentage incorrect");
-
-			await cutMutation({ variables: {
-				gameId: globalStore.gameId,
-				token: globalStore.token,
-				wherePercentage,
-			} });
-			if (globalStore.refetch) await globalStore.refetch();
-		}
-		catch (err) {
-			// eslint-disable-next-line no-alert
-			alert("Erreur : " + err);
-		}
-	}, [cutMutation]);
-	const deal = React.useCallback(async () => {
-		// eslint-disable-next-line no-alert
-		const byString = prompt("Par combien ?", "[3, 2, 3]");
-		if (byString === null) return;
-		// eslint-disable-next-line no-alert
-		const firstPlayerString = prompt("En commençant par le joueur numéro ?", globalStore.player === null ? '' : String((globalStore.player + 1) % 4));
-		if (firstPlayerString === null) return;
-		try {
-			const by = JSON.parse(byString);
-			if (
-				!by || !Array.isArray(by) || by.length !== 3
-				|| by.some((nb) => nb !== 3 && nb !== 2)
-			|| by.reduce((acc, cur) => acc + cur, 0) !== 8
-			) throw new Error("Répartition incorrecte");
-
-			const firstPlayer = parseInt(firstPlayerString, 10);
-			if (![0, 1, 2, 3].includes(firstPlayer)) throw new Error("Numéro de joueur incorrect");
-
-			await dealMutation({ variables: {
-				gameId: globalStore.gameId,
-				token: globalStore.token,
-				by,
-				firstPlayer,
-			} });
-			if (globalStore.refetch) await globalStore.refetch();
-		}
-		catch (err) {
-			// eslint-disable-next-line no-alert
-			alert("Erreur : " + err);
-		}
-	}, [dealMutation]);
-	const sortHand = React.useCallback(async (trump: string | null) => {
-		try {
-			await sortHandMutation({ variables: {
-				gameId: globalStore.gameId,
-				token: globalStore.token,
-				trump,
-			} });
-			if (globalStore.refetch) await globalStore.refetch();
-		}
-		catch (err) {
-			// eslint-disable-next-line no-alert
-			alert("Erreur : " + err);
-		}
-	}, [sortHandMutation]);
 	const lookLastTrick = React.useCallback(async () => {
 		try {
 			const res = await lookLastTrickMutation({ variables: {
@@ -372,21 +266,7 @@ export default observer(() => {
 				<Button text="Changer de nom" onClick={setPlayerName} />
 				<br />
 				<br />
-				<Button text="Mélanger" onClick={shuffle} />
-				<Button text="Couper" onClick={cut} />
-				<Button text="Distribuer" onClick={deal} />
 				<Button text="Reformer le jeu" onClick={regroup} />
-				<br />
-				<div>Trier mes cartes :</div>
-				<Button text="Sans atout" onClick={sortHand} onClickArg={null} />
-				<div>
-					<Button text="Coeur" onClick={sortHand} small={true} onClickArg='H' />
-					<Button text="Trèfle" onClick={sortHand} small={true} onClickArg='C' />
-				</div>
-				<div>
-					<Button text="Carreau" onClick={sortHand} small={true} onClickArg='D' />
-					<Button text="Pique" onClick={sortHand} small={true} onClickArg='S' />
-				</div>
 				<br />
 				<br />
 				<Button text="Dernier pli" onClick={lookLastTrick} />

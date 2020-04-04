@@ -5,15 +5,18 @@ import { observer } from "mobx-react";
 import moment from 'moment-timezone';
 
 
+const style = {
+	overflow: 'scroll',
+	flex: 1,
+};
+
+const ulStyle = {
+	paddingLeft: '20px',
+};
+
 export default observer(() =>
-	<div>
-		<ol start={0} >
-			{
-				// eslint-disable-next-line react/no-array-index-key
-				globalStore.players.map((p: string, i: number) => <li key={i}>{globalStore.lastDealer === i ? <b>{p}</b> : p}</li>)
-			}
-		</ol>
-		<ul>
+	<div style={style} >
+		<ul style={ulStyle}>
 			{
 				[...globalStore.actions].reverse().slice(0, 20).map(
 					(a: { text: string, ticks: number }, i: number) =>
