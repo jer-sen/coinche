@@ -1,13 +1,20 @@
 import * as React from "react";
 
-export default ({ text, onClick, small = false }: { text: string, small?: boolean, onClick: () => Promise<void> | void }) => {
+export default (
+	{ text, onClick, small = false, onClickArg }
+	: {
+		text: string,
+		small?: boolean,
+		onClick?: undefined | ((onClickArg?: any) => (void | Promise<void>)),
+		onClickArg?: any,
+	}) => {
 	const [waiting, setWaiting] = React.useState(false);
 
-	const onClickHandler = React.useCallback(async () => {
+	const handleOnClick = React.useCallback(async () => {
 		setWaiting(true);
-		await onClick();
+		if (onClick) await onClick(onClickArg);
 		setWaiting(false);
-	}, [setWaiting, onClick]);
+	}, [onClick, onClickArg]);
 
 	const style = React.useMemo(() => ({
 		margin: '2px',
@@ -16,5 +23,5 @@ export default ({ text, onClick, small = false }: { text: string, small?: boolea
 		borderRadius: '12px',
 	}), [small]);
 
-	return <button onClick={onClickHandler} style={style} disabled={waiting} type='button'>{waiting ? '...' : text}</button>;
+	return <button onClick={handleOnClick} style={style} disabled={waiting} type='button'>{waiting ? '...' : text}</button>;
 };

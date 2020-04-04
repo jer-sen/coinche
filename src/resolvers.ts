@@ -9,7 +9,7 @@ import { Kind, GraphQLScalarType } from 'graphql';
 let col: Collection<any> | null = null;
 export const initializeCollection = async () => {
 	// eslint-disable-next-line no-process-env, global-require
-	const MONGODB_URI = process.env.MONGODB_URI || (require('./env').default || {}).MONGODB_URI;
+	const MONGODB_URI = process.env.MONGODB_URI || (require('../env').default || {}).MONGODB_URI;
 	const client = await MongoClient.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 	const dbName = MONGODB_URI.match(/^.*\/([a-zA-Z0-9_]+$)/u)[1];
 	col = client.db(dbName).collection('games');

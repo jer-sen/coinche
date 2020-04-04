@@ -5,9 +5,22 @@ import { observer } from "mobx-react";
 
 import globalStore from "../globalStore";
 import Card from "./Card";
-import { playCardMutationDoc, takeTrickMutationDoc } from './Buttons';
 import { action } from "mobx";
 
+
+const playCardMutationDoc = gql`
+	mutation($gameId: ID!, $token: String!, $card: String!) {
+		# true si ok
+		playCard(gameId: $gameId, token: $token, card: $card)
+	}
+`;
+
+const takeTrickMutationDoc = gql`
+	mutation($gameId: ID!, $token: String!) {
+		# true si ok
+		takeTrick(gameId: $gameId, token: $token)
+	}
+`;
 
 const dataQuery = gql`
 	query($id: ID!, $token: String!) {
@@ -50,34 +63,36 @@ const getTop = (relativeIndex: number) => {
 
 export default observer(() => {
 	const skip = !globalStore.gameId || !globalStore.token;
-	const { loading, error, data } = useQuery(dataQuery, {
+	const { loading, error, refetch, data } = useQuery(dataQuery, {
 		variables: { id: globalStore.gameId, token: globalStore.token },
 		skip,
-		pollInterval: skip ? undefined : 500,
+		pollInterval: skip ? undefined : 1000,
 	});
 
 	const [playCardMutation] = useMutation(playCardMutationDoc);
 	const [takeTrickMutation] = useMutation(takeTrickMutationDoc);
 
-	const playCard = cardSet.map((card) => React.useCallback(async () => {
+	const playCard = React.useCallback(async (card) => {
 		try {
 			await playCardMutation({ variables: {
 				gameId: globalStore.gameId,
 				token: globalStore.token,
 				card,
 			} });
+			if (globalStore.refetch) await globalStore.refetch();
 		}
 		catch (err) {
 			// eslint-disable-next-line no-alert
 			alert("Erreur : " + err);
 		}
-	}, [card]));
+	}, [playCardMutation]);
 	const takeTrick = React.useCallback(async () => {
 		try {
 			await takeTrickMutation({ variables: {
 				gameId: globalStore.gameId,
 				token: globalStore.token,
 			} });
+			if (globalStore.refetch) await globalStore.refetch();
 		}
 		catch (err) {
 			// eslint-disable-next-line no-alert
@@ -91,7 +106,8 @@ export default observer(() => {
 		globalStore.players = data.game.players;
 		globalStore.lastDealer = data.game.lastDealer;
 		globalStore.player = data.game.player;
-	}), [data]);
+		globalStore.refetch = refetch;
+	}), [data, refetch]);
 
 	if (loading) return <p>Loading...</p>;
 	if (error) return <p>Error : {error.toString()}</p>;
@@ -206,7 +222,8 @@ export default observer(() => {
 											code={c}
 											key={c}
 											style={{ position: 'absolute', width: '100px', left: ((i - 4) * 45) + 'px', top: '180px' }}
-											onClick={playCard[cardSet.indexOf(c)]}
+											onClick={playCard}
+											onClickArg={c}
 										/>,
 									)
 								}

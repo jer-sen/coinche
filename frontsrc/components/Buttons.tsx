@@ -65,24 +65,13 @@ const lookLastTrickMutationDoc = gql`
 		}
 	}
 `;
-export const playCardMutationDoc = gql`
-	mutation($gameId: ID!, $token: String!, $card: String!) {
-		# true si ok
-		playCard(gameId: $gameId, token: $token, card: $card)
-	}
-`;
 const unplayCardMutationDoc = gql`
 	mutation($gameId: ID!, $token: String!) {
 		# true si ok
 		unplayCard(gameId: $gameId, token: $token)
 	}
 `;
-export const takeTrickMutationDoc = gql`
-	mutation($gameId: ID!, $token: String!) {
-		# true si ok
-		takeTrick(gameId: $gameId, token: $token)
-	}
-`;
+
 const untakeTrickMutationDoc = gql`
 	mutation($gameId: ID!, $token: String!) {
 		# true si ok
@@ -97,13 +86,6 @@ const regroupMutationDoc = gql`
 `;
 
 const colors = ['blue', 'green', 'grey', 'purple', 'red', 'yellow'];
-
-const cardSet = [
-	'7C', '8C', '9C', '10C', 'JC', 'QC', 'KC', 'AC',
-	'7D', '8D', '9D', '10D', 'JD', 'QD', 'KD', 'AD',
-	'7H', '8H', '9H', '10H', 'JH', 'QH', 'KH', 'AH',
-	'7S', '8S', '9S', '10S', 'JS', 'QS', 'KS', 'AS',
-];
 
 const getCardName = (card: string) => (
 	(({
@@ -137,9 +119,7 @@ export default observer(() => {
 	const [dealMutation] = useMutation(dealMutationDoc);
 	const [sortHandMutation] = useMutation(sortHandMutationDoc);
 	const [lookLastTrickMutation] = useMutation(lookLastTrickMutationDoc);
-	const [playCardMutation] = useMutation(playCardMutationDoc);
 	const [unplayCardMutation] = useMutation(unplayCardMutationDoc);
-	const [takeTrickMutation] = useMutation(takeTrickMutationDoc);
 	const [untakeTrickMutation] = useMutation(untakeTrickMutationDoc);
 	const [regroupMutation] = useMutation(regroupMutationDoc);
 
@@ -158,6 +138,7 @@ export default observer(() => {
 				"Vous pouvez envoyer l'id dans la zone de texte aux autres joueurs qui devront le mettre dans cette même zone de texte."
 				+ " Chaque joueur doit ensuite cliquer sur Rejoindre.",
 			);
+			if (globalStore.refetch) await globalStore.refetch();
 		}
 		catch (err) {
 			// eslint-disable-next-line no-alert
@@ -180,6 +161,7 @@ export default observer(() => {
 			runInAction(() => {
 				globalStore.token = res.data.joinGame;
 			});
+			if (globalStore.refetch) await globalStore.refetch();
 		}
 		catch (err) {
 			// eslint-disable-next-line no-alert
@@ -199,6 +181,7 @@ export default observer(() => {
 				token: globalStore.token,
 				color,
 			} });
+			if (globalStore.refetch) await globalStore.refetch();
 		}
 		catch (err) {
 			// eslint-disable-next-line no-alert
@@ -217,6 +200,7 @@ export default observer(() => {
 				token: globalStore.token,
 				name,
 			} });
+			if (globalStore.refetch) await globalStore.refetch();
 		}
 		catch (err) {
 			// eslint-disable-next-line no-alert
@@ -229,6 +213,7 @@ export default observer(() => {
 				gameId: globalStore.gameId,
 				token: globalStore.token,
 			} });
+			if (globalStore.refetch) await globalStore.refetch();
 		}
 		catch (err) {
 			// eslint-disable-next-line no-alert
@@ -248,6 +233,7 @@ export default observer(() => {
 				token: globalStore.token,
 				wherePercentage,
 			} });
+			if (globalStore.refetch) await globalStore.refetch();
 		}
 		catch (err) {
 			// eslint-disable-next-line no-alert
@@ -278,71 +264,21 @@ export default observer(() => {
 				by,
 				firstPlayer,
 			} });
+			if (globalStore.refetch) await globalStore.refetch();
 		}
 		catch (err) {
 			// eslint-disable-next-line no-alert
 			alert("Erreur : " + err);
 		}
 	}, [dealMutation]);
-	const sortHand = React.useCallback(async () => {
+	const sortHand = React.useCallback(async (trump: string | null) => {
 		try {
 			await sortHandMutation({ variables: {
 				gameId: globalStore.gameId,
 				token: globalStore.token,
-				trump: null,
+				trump,
 			} });
-		}
-		catch (err) {
-			// eslint-disable-next-line no-alert
-			alert("Erreur : " + err);
-		}
-	}, [sortHandMutation]);
-	const sortHandH = React.useCallback(async () => {
-		try {
-			await sortHandMutation({ variables: {
-				gameId: globalStore.gameId,
-				token: globalStore.token,
-				trump: 'H',
-			} });
-		}
-		catch (err) {
-			// eslint-disable-next-line no-alert
-			alert("Erreur : " + err);
-		}
-	}, [sortHandMutation]);
-	const sortHandC = React.useCallback(async () => {
-		try {
-			await sortHandMutation({ variables: {
-				gameId: globalStore.gameId,
-				token: globalStore.token,
-				trump: 'C',
-			} });
-		}
-		catch (err) {
-			// eslint-disable-next-line no-alert
-			alert("Erreur : " + err);
-		}
-	}, [sortHandMutation]);
-	const sortHandD = React.useCallback(async () => {
-		try {
-			await sortHandMutation({ variables: {
-				gameId: globalStore.gameId,
-				token: globalStore.token,
-				trump: 'D',
-			} });
-		}
-		catch (err) {
-			// eslint-disable-next-line no-alert
-			alert("Erreur : " + err);
-		}
-	}, [sortHandMutation]);
-	const sortHandS = React.useCallback(async () => {
-		try {
-			await sortHandMutation({ variables: {
-				gameId: globalStore.gameId,
-				token: globalStore.token,
-				trump: 'S',
-			} });
+			if (globalStore.refetch) await globalStore.refetch();
 		}
 		catch (err) {
 			// eslint-disable-next-line no-alert
@@ -367,31 +303,13 @@ export default observer(() => {
 					).join('\n')
 				,
 			);
+			if (globalStore.refetch) await globalStore.refetch();
 		}
 		catch (err) {
 			// eslint-disable-next-line no-alert
 			alert("Erreur : " + err);
 		}
 	}, [lookLastTrickMutation]);
-	const playCard = React.useCallback(async () => {
-		// eslint-disable-next-line no-alert
-		const cardString = prompt("Carte (" + cardSet.join(', ') + ") :");
-		if (cardString === null) return;
-		try {
-			const card = cardString;
-			if (!cardSet.includes(card)) throw new Error("Carte incorrecte");
-
-			await playCardMutation({ variables: {
-				gameId: globalStore.gameId,
-				token: globalStore.token,
-				card,
-			} });
-		}
-		catch (err) {
-			// eslint-disable-next-line no-alert
-			alert("Erreur : " + err);
-		}
-	}, [playCardMutation]);
 	const unplayCard = React.useCallback(async () => {
 		try {
 			await unplayCardMutation({ variables: {
@@ -404,24 +322,13 @@ export default observer(() => {
 			alert("Erreur : " + err);
 		}
 	}, [unplayCardMutation]);
-	const takeTrick = React.useCallback(async () => {
-		try {
-			await takeTrickMutation({ variables: {
-				gameId: globalStore.gameId,
-				token: globalStore.token,
-			} });
-		}
-		catch (err) {
-			// eslint-disable-next-line no-alert
-			alert("Erreur : " + err);
-		}
-	}, [takeTrickMutation]);
 	const untakeTrick = React.useCallback(async () => {
 		try {
 			await untakeTrickMutation({ variables: {
 				gameId: globalStore.gameId,
 				token: globalStore.token,
 			} });
+			if (globalStore.refetch) await globalStore.refetch();
 		}
 		catch (err) {
 			// eslint-disable-next-line no-alert
@@ -441,6 +348,7 @@ export default observer(() => {
 				token: globalStore.token,
 				order,
 			} });
+			if (globalStore.refetch) await globalStore.refetch();
 		}
 		catch (err) {
 			// eslint-disable-next-line no-alert
@@ -470,21 +378,19 @@ export default observer(() => {
 				<Button text="Reformer le jeu" onClick={regroup} />
 				<br />
 				<div>Trier mes cartes :</div>
-				<Button text="Sans atout" onClick={sortHand} />
+				<Button text="Sans atout" onClick={sortHand} onClickArg={null} />
 				<div>
-					<Button text="Coeur" onClick={sortHandH} small={true} />
-					<Button text="Trèfle" onClick={sortHandC} small={true} />
+					<Button text="Coeur" onClick={sortHand} small={true} onClickArg='H' />
+					<Button text="Trèfle" onClick={sortHand} small={true} onClickArg='C' />
 				</div>
 				<div>
-					<Button text="Carreau" onClick={sortHandD} small={true} />
-					<Button text="Pique" onClick={sortHandS} small={true} />
+					<Button text="Carreau" onClick={sortHand} small={true} onClickArg='D' />
+					<Button text="Pique" onClick={sortHand} small={true} onClickArg='S' />
 				</div>
 				<br />
 				<br />
 				<Button text="Dernier pli" onClick={lookLastTrick} />
-				<Button text="Poser une carte" onClick={playCard} />
 				<Button text="Reprendre ma carte" onClick={unplayCard} />
-				<Button text="Prendre le pli" onClick={takeTrick} />
 				<Button text="Reposer le pli" onClick={untakeTrick} />
 			</div>
 		</div>
