@@ -99,6 +99,13 @@ export default observer(() => {
 
 	const [{ valet, neuf, belote, der }, setCountOptions] = React.useState({ valet: null, neuf: null, belote: null, der: null });
 
+	React.useEffect(() => {
+		if (!data.game.winnedCards) setCountOptions((prevState) => {
+			if (prevState.valet === null && prevState.neuf === null && prevState.belote === null && prevState.der === null) return prevState;
+			return { valet: null, neuf: null, belote: null, der: null };
+		});
+	}, [data.game.winnedCards]);
+
 	const [regroupMutation] = useMutation(regroupMutationDoc);
 	const [shuffleMutation] = useMutation(shuffleMutationDoc);
 	const [cutMutation] = useMutation(cutMutationDoc);
