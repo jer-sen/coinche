@@ -104,7 +104,8 @@ export default observer(() => {
 			if (prevState.valet === null && prevState.neuf === null && prevState.belote === null && prevState.der === null) return prevState;
 			return { valet: null, neuf: null, belote: null, der: null };
 		});
-	}, [data.game.winnedCards]);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [setCountOptions]);
 
 	const [regroupMutation] = useMutation(regroupMutationDoc);
 	const [shuffleMutation] = useMutation(shuffleMutationDoc);
