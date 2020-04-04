@@ -1,3 +1,12 @@
+Installer :
+- node
+- yarn
+- git
+
+Installer les modules globaux via yarn : yarn global add typescript eslint ts-node
+Si nécessaire ajouter le chemin des modules globaux (obtenu via yarn global bin) au PATH
+
+
 Pour développer lancer 3 bash :
  - watching ts (recompiler automatiquement le serveur) : npm run wts
  - watching node (relancer automatiquement le serveur): npm run wn
