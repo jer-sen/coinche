@@ -105,7 +105,7 @@ export default observer(() => {
 			return { valet: null, neuf: null, belote: null, der: null };
 		});
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [setCountOptions]);
+	}, [setCountOptions, data && data.game && !data.game.winnedCards]);
 
 	const [regroupMutation] = useMutation(regroupMutationDoc);
 	const [shuffleMutation] = useMutation(shuffleMutationDoc);
