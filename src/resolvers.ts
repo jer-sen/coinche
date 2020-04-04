@@ -350,12 +350,16 @@ export default {
 			gameData.winnedCards[player % 2] = [...gameData.currentTrick.map((pc) => pc.card), ...gameData.winnedCards[player % 2]];
 			if (gameData.hands.every((h) => h.length === 0)) {
 				// Partie finie
-				await col.updateOne({ _id: gameData._id }, { $set: {
-					hands: null,
-					winnedCards: gameData.winnedCards,
-					currentTrick: null,
-					lastTrick: null,
-				} });
+				await col.updateOne({ _id: gameData._id }, {
+					$set: {
+						hands: null,
+						winnedCards: gameData.winnedCards,
+						currentTrick: null,
+						lastTrick: null,
+					},
+					// eslint-disable-next-line max-len
+					$push: { actions: { text: "Dernier pli pris par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() } },
+				});
 			}
 			else {
 				// Partie pas finie
