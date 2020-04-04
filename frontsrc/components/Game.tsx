@@ -333,10 +333,10 @@ export default observer(() => {
 													<input type="checkbox" checked={neuf === team} onChange={countOptions[team].neuf} />9 d'atout
 												</label>
 												<label style={{ marginLeft: '5px' }}>
-													<input type="checkbox" checked={belote === team} onChange={countOptions[team].belote} />belote
+													<input type="checkbox" checked={der === team} onChange={countOptions[team].der} />10 de der
 												</label>
 												<label style={{ marginLeft: '5px' }}>
-													<input type="checkbox" checked={der === team} onChange={countOptions[team].der} />10 de der
+													<input type="checkbox" checked={belote === team} onChange={countOptions[team].belote} />belote
 												</label>
 											</div>
 										</React.Fragment>,
