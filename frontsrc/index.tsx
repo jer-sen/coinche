@@ -21,7 +21,7 @@ const client = new ApolloClient({
 
 ReactDOM.render(
 	<ApolloProvider client={client}>
-		<div style={{ width: '100vw', height: '100vh', backgroundColor: 'green', flexDirection: 'row', display: 'flex' }}>
+		<div style={{ width: '100vw', height: '100vh', flexDirection: 'row', display: 'flex' }}>
 			<div style={{ minWidth: '154px', flex: 1, display: 'flex', flexDirection: 'column' }}>
 				<Buttons />
 				<Players />
