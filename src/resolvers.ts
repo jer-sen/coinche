@@ -141,7 +141,7 @@ export default {
 			await col.updateOne({ _id: gameData._id }, {
 				$set: { players: players },
 				// eslint-disable-next-line max-len
-				$push: { actions: { text: "Nouveau joueur " + ('"' + (gameData.players[args.player].name || "joueur " + args.player) + '"'), ticks: Date.now() } },
+				$push: { actions: { $each: [{ text: "Nouveau joueur " + ('"' + (gameData.players[args.player].name || "joueur " + args.player) + '"'), ticks: Date.now() }], $slice: -100 } },
 			});
 			return token;
 		},
@@ -155,7 +155,7 @@ export default {
 			await col.updateOne({ _id: gameData._id }, {
 				$set: { backColor: args.color },
 				// eslint-disable-next-line max-len
-				$push: { actions: { text: "Nouvelle couleur choisie par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() } },
+				$push: { actions: { $each: [{ text: "Nouvelle couleur choisie par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() }], $slice: -100 } },
 			});
 			return true;
 		},
@@ -170,7 +170,7 @@ export default {
 			await col.updateOne({ _id: gameData._id }, {
 				$set: { players: players },
 				// eslint-disable-next-line max-len
-				$push: { actions: { text: "Le joueur " + player + " a changé son nom pour " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() } },
+				$push: { actions: { $each: [{ text: "Le joueur " + player + " a changé son nom pour " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() }], $slice: -100 } },
 			});
 			return true;
 		},
@@ -183,7 +183,8 @@ export default {
 
 			await col.updateOne({ _id: gameData._id }, {
 				$set: { toDeal: shuffle(gameData.toDeal) },
-				$push: { actions: { text: "Jeu mélangé par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() } },
+				// eslint-disable-next-line max-len
+				$push: { actions: { $each: [{ text: "Jeu mélangé par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() }], $slice: -100 } },
 			});
 			return true;
 		},
@@ -200,7 +201,7 @@ export default {
 			await col.updateOne({ _id: gameData._id }, {
 				$set: { toDeal: [...gameData.toDeal.slice(pivot), ...gameData.toDeal.slice(0, pivot)] },
 				// eslint-disable-next-line max-len
-				$push: { actions: { text: "Jeu coupé à " + args.wherePercentage + "% par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() } },
+				$push: { actions: { $each: [{ text: "Jeu coupé à " + args.wherePercentage + "% par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() }], $slice: -100 } },
 			});
 			return true;
 		},
@@ -225,7 +226,7 @@ export default {
 			await col.updateOne({ _id: gameData._id }, {
 				$set: { toDeal: null, hands, currentTrick: [], winnedCards: [[], []], lastDealer: player },
 				// eslint-disable-next-line max-len
-				$push: { actions: { text: "Cartes distribuées en " + JSON.stringify(args.by) + " par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() } },
+				$push: { actions: { $each: [{ text: "Cartes distribuées par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"') + " en " + JSON.stringify(args.by) + " en commançant par " + ('"' + (gameData.players[args.firstPlayer].name || "joueur " + player) + '"'), ticks: Date.now() }], $slice: -100 } },
 			});
 			return true;
 		},
@@ -285,7 +286,8 @@ export default {
 
 			await col.updateOne({ _id: gameData._id }, {
 				$set: { hands: gameData.hands },
-				$push: { actions: { text: ('"' + (gameData.players[player].name || "joueur " + player) + '"') + " a trié ses cartes", ticks: Date.now() } },
+				// eslint-disable-next-line max-len
+				$push: { actions: { $each: [{ text: ('"' + (gameData.players[player].name || "joueur " + player) + '"') + " a trié ses cartes", ticks: Date.now() }], $slice: -100 } },
 			});
 			return true;
 		},
@@ -297,7 +299,7 @@ export default {
 			
 			await col.updateOne({ _id: gameData._id }, {
 				// eslint-disable-next-line max-len
-				$push: { actions: { text: ('"' + (gameData.players[player].name || "joueur " + player) + '"') + " a regardé le dernier pli", ticks: Date.now() } },
+				$push: { actions: { $each: [{ text: ('"' + (gameData.players[player].name || "joueur " + player) + '"') + " a regardé le dernier pli", ticks: Date.now() }], $slice: -100 } },
 			});
 			return gameData.lastTrick;
 		},
@@ -320,7 +322,8 @@ export default {
 			gameData.hands[player].splice(cardIndex, 1);
 			await col.updateOne({ _id: gameData._id }, {
 				$set: { currentTrick: gameData.currentTrick, hands: gameData.hands },
-				$push: { actions: { text: "Carte jouée par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() } },
+				// eslint-disable-next-line max-len
+				$push: { actions: { $each: [{ text: "Carte jouée par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() }], $slice: -100 } },
 			});
 			return true;
 		},
@@ -336,7 +339,8 @@ export default {
 			gameData.hands[player].push(gameData.currentTrick.splice(gameData.currentTrick.length - 1, 1)[0].card);
 			await col.updateOne({ _id: gameData._id }, {
 				$set: { currentTrick: gameData.currentTrick, hands: gameData.hands },
-				$push: { actions: { text: "Carte reprise par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() } },
+				// eslint-disable-next-line max-len
+				$push: { actions: { $each: [{ text: "Carte reprise par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() }], $slice: -100 } },
 			});
 			return true;
 		},
@@ -358,7 +362,7 @@ export default {
 						lastTrick: null,
 					},
 					// eslint-disable-next-line max-len
-					$push: { actions: { text: "Dernier pli pris par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() } },
+					$push: { actions: { $each: [{ text: "Dernier pli pris par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() }], $slice: -100 } },
 				});
 			}
 			else {
@@ -369,7 +373,8 @@ export default {
 						currentTrick: [],
 						lastTrick: gameData.currentTrick,
 					},
-					$push: { actions: { text: "Pli pris par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() } },
+					// eslint-disable-next-line max-len
+					$push: { actions: { $each: [{ text: "Pli pris par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() }], $slice: -100 } },
 				});
 			}
 			return true;
@@ -393,7 +398,8 @@ export default {
 					currentTrick: gameData.lastTrick,
 					lastTrick: null,
 				},
-				$push: { actions: { text: "Pli reposé par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() } },
+				// eslint-disable-next-line max-len
+				$push: { actions: { $each: [{ text: "Pli reposé par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() }], $slice: -100 } },
 			});
 			return true;
 		},
@@ -421,7 +427,7 @@ export default {
 					toDeal: [].concat(...args.order.map((o) => toRegroup[o])),
 				},
 				// eslint-disable-next-line max-len
-				$push: { actions: { text: "Jeu reformé (ordre " + JSON.stringify(args.order) + ") par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() } },
+				$push: { actions: { $each: [{ text: "Jeu reformé (ordre " + JSON.stringify(args.order) + ") par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() }], $slice: -100 } },
 			});
 
 			return true;
