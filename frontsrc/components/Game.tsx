@@ -67,7 +67,7 @@ const dataQuery = gql`
 				ticks
 			}
 			backColor
-			lastDealer
+			lastFirstPlayer
 		}
 	}
 `;
@@ -251,7 +251,7 @@ export default observer(() => {
 		if (!data) return;
 		globalStore.actions = data.game.actions;
 		globalStore.players = data.game.players;
-		globalStore.lastDealer = data.game.lastDealer;
+		globalStore.lastFirstPlayer = data.game.lastFirstPlayer;
 		globalStore.player = data.game.player;
 		globalStore.refetch = refetch;
 	}), [data, refetch]);

@@ -5,7 +5,7 @@ const globalStore = observable({
 	token: JSON.parse(localStorage.getItem('token') || 'null'),
 	actions: [],
 	players: [],
-	lastDealer: null,
+	lastFirstPlayer: null,
 	player: null,
 	refetch: null,
 });
