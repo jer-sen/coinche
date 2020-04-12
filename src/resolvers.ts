@@ -6,7 +6,7 @@ import { ObjectID, MongoClient, Collection } from 'mongodb';
 import moment from 'moment-timezone';
 import { Kind, GraphQLScalarType } from 'graphql';
 
-let col: Collection<any> | null = null;
+let col: Collection<GameData> | null = null;
 export const initializeCollection = async () => {
 	// eslint-disable-next-line no-process-env, global-require
 	const MONGODB_URI = process.env.MONGODB_URI || (require('../env').default || {}).MONGODB_URI;
@@ -97,7 +97,8 @@ export default {
 
 	Query: {
 		game: async (_: any, args: { id: string, token: string }) => {
-			const gameData = await col.findOne({ _id: new ObjectID(args.id) }) as GameData | null;
+			if (col === null) throw new Error("Collection non initialized");
+			const gameData = await col.findOne({ _id: new ObjectID(args.id) });
 			if (!gameData) throw new Error("Wrong id");
 			const player = gameData.players.findIndex(({ token }) => token === args.token);
 			if (player < 0) throw new Error("Wrong player");
@@ -118,6 +119,7 @@ export default {
 
 	Mutation: {
 		createGame: async () => {
+			if (col === null) throw new Error("Collection non initialized");
 			const res = await col.insertOne({
 				players: [{ name: null, token: null }, { name: null, token: null }, { name: null, token: null }, { name: null, token: null }],
 				hands: null,
@@ -132,7 +134,8 @@ export default {
 			return res.insertedId;
 		},
 		joinGame: async (_: any, args: { gameId: string, player: number }) => {
-			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) }) as GameData | null;
+			if (col === null) throw new Error("Collection non initialized");
+			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) });
 			if (!gameData) throw new Error("Wrong gameId");
 			if (![0, 1, 2, 3].includes(args.player)) throw new Error("Wrong player");
 			const token = makeid(10);
@@ -146,7 +149,8 @@ export default {
 			return token;
 		},
 		setBackColor: async (_: any, args: { gameId: string, token: string, color: string }) => {
-			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) }) as GameData | null;
+			if (col === null) throw new Error("Collection non initialized");
+			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) });
 			if (!gameData) throw new Error("Wrong gameId");
 			const player = gameData.players.findIndex(({ token }) => token === args.token);
 			if (player < 0) throw new Error("Wrong token");
@@ -160,7 +164,8 @@ export default {
 			return true;
 		},
 		setPlayerName: async (_: any, args: { gameId: string, token: string, name: string }) => {
-			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) }) as GameData | null;
+			if (col === null) throw new Error("Collection non initialized");
+			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) });
 			if (!gameData) throw new Error("Wrong gameId");
 			const player = gameData.players.findIndex(({ token }) => token === args.token);
 			if (player < 0) throw new Error("Wrong token");
@@ -175,7 +180,8 @@ export default {
 			return true;
 		},
 		shuffle: async (_: any, args: { gameId: string, token: string }) => {
-			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) }) as GameData | null;
+			if (col === null) throw new Error("Collection non initialized");
+			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) });
 			if (!gameData) throw new Error("Wrong gameId");
 			const player = gameData.players.findIndex(({ token }) => token === args.token);
 			if (player < 0) throw new Error("Wrong token");
@@ -189,7 +195,8 @@ export default {
 			return true;
 		},
 		cut: async (_: any, args: { gameId: string, token: string, wherePercentage: number }) => {
-			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) }) as GameData | null;
+			if (col === null) throw new Error("Collection non initialized");
+			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) });
 			if (!gameData) throw new Error("Wrong gameId");
 			const player = gameData.players.findIndex(({ token }) => token === args.token);
 			if (player < 0) throw new Error("Wrong token");
@@ -206,7 +213,8 @@ export default {
 			return true;
 		},
 		deal: async (_: any, args: { gameId: string, token: string, by: number[], firstPlayer: number }) => {
-			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) }) as GameData | null;
+			if (col === null) throw new Error("Collection non initialized");
+			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) });
 			if (!gameData) throw new Error("Wrong gameId");
 			const player = gameData.players.findIndex(({ token }) => token === args.token);
 			if (player < 0) throw new Error("Wrong token");
@@ -220,7 +228,7 @@ export default {
 			const hands: string[][] = [[], [], [], []];
 			args.by.forEach((nb: number) => {
 				for (let i = args.firstPlayer + 1; i <= args.firstPlayer + 4; i++) {
-					hands[i % 4] = [...gameData.toDeal.splice(0, nb), ...hands[i % 4]];
+					hands[i % 4] = [...gameData.toDeal!.splice(0, nb), ...hands[i % 4]];
 				}
 			});
 			await col.updateOne({ _id: gameData._id }, {
@@ -231,7 +239,8 @@ export default {
 			return true;
 		},
 		sortHand: async (_: any, args: { gameId: string, token: string, trump: string | null }) => {
-			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) }) as GameData | null;
+			if (col === null) throw new Error("Collection non initialized");
+			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) });
 			if (!gameData) throw new Error("Wrong gameId");
 			const player = gameData.players.findIndex(({ token }) => token === args.token);
 			if (player < 0) throw new Error("Wrong token");
@@ -246,7 +255,7 @@ export default {
 				const suit = cur.substr(-1);
 				if (!acc.includes(suit)) acc.push(suit);
 				return acc;
-			}, []);
+			}, [] as string[]);
 			const nbColors = [0, 1].map((c) => suitsInHand.reduce((acc, cur) => acc + (getCardColor(cur) === c ? 1 : 0), 0));
 			let lastColor: number | null =
 				nbColors[0] === nbColors[1] ?
@@ -292,7 +301,8 @@ export default {
 			return true;
 		},
 		lookLastTrick: async (_: any, args: { gameId: string, token: string }) => {
-			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) }) as GameData | null;
+			if (col === null) throw new Error("Collection non initialized");
+			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) });
 			if (!gameData) throw new Error("Wrong gameId");
 			const player = gameData.players.findIndex(({ token }) => token === args.token);
 			if (player < 0) throw new Error("Wrong token");
@@ -304,11 +314,12 @@ export default {
 			return gameData.lastTrick;
 		},
 		playCard: async (_: any, args: { gameId: string, token: string, card: string }) => {
-			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) }) as GameData | null;
+			if (col === null) throw new Error("Collection non initialized");
+			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) });
 			if (!gameData) throw new Error("Wrong gameId");
 			const player = gameData.players.findIndex(({ token }) => token === args.token);
 			if (player < 0) throw new Error("Wrong token");
-			if (!gameData.currentTrick) throw new Error("Wrong game state");
+			if (!gameData.currentTrick || !gameData.hands) throw new Error("Wrong game state");
 			if (gameData.currentTrick.some((cp) => cp.player === player)) throw new Error("Already played");
 			if (
 				gameData.currentTrick.length > 0
@@ -328,11 +339,12 @@ export default {
 			return true;
 		},
 		unplayCard: async (_: any, args: { gameId: string, token: string }) => {
-			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) }) as GameData | null;
+			if (col === null) throw new Error("Collection non initialized");
+			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) });
 			if (!gameData) throw new Error("Wrong gameId");
 			const player = gameData.players.findIndex(({ token }) => token === args.token);
 			if (player < 0) throw new Error("Wrong token");
-			if (!gameData.currentTrick) throw new Error("Wrong game state");
+			if (!gameData.currentTrick || !gameData.hands) throw new Error("Wrong game state");
 			if (gameData.currentTrick.length === 0) throw new Error("No card played");
 			if (gameData.currentTrick[gameData.currentTrick.length - 1].player !== player) throw new Error("Not last card player");
 			
@@ -345,11 +357,16 @@ export default {
 			return true;
 		},
 		takeTrick: async (_: any, args: { gameId: string, token: string }) => {
-			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) }) as GameData | null;
+			if (col === null) throw new Error("Collection non initialized");
+			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) });
 			if (!gameData) throw new Error("Wrong gameId");
 			const player = gameData.players.findIndex(({ token }) => token === args.token);
 			if (player < 0) throw new Error("Wrong token");
-			if (!gameData.currentTrick || gameData.currentTrick.length !== 4) throw new Error("Wrong game state");
+			if (
+				!gameData.currentTrick || gameData.currentTrick.length !== 4
+				|| !gameData.winnedCards
+				|| !gameData.hands
+			) throw new Error("Wrong game state");
 
 			gameData.winnedCards[player % 2] = [...gameData.currentTrick.map((pc) => pc.card), ...gameData.winnedCards[player % 2]];
 			if (gameData.hands.every((h) => h.length === 0)) {
@@ -380,16 +397,21 @@ export default {
 			return true;
 		},
 		untakeTrick: async (_: any, args: { gameId: string, token: string }) => {
-			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) }) as GameData | null;
+			if (col === null) throw new Error("Collection non initialized");
+			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) });
 			if (!gameData) throw new Error("Wrong gameId");
 			const player = gameData.players.findIndex(({ token }) => token === args.token);
 			if (player < 0) throw new Error("Wrong token");
-			if (!gameData.currentTrick || gameData.currentTrick.length !== 0 || !gameData.lastTrick) throw new Error("Wrong game state");
+			if (
+				!gameData.currentTrick || gameData.currentTrick.length !== 0
+				|| !gameData.lastTrick
+				|| !gameData.winnedCards
+			) throw new Error("Wrong game state");
 
 			gameData.lastTrick.forEach(({ card }: { card: string}) => {
 				[0, 1].forEach((team) => {
-					const index = gameData.winnedCards[team].indexOf(card);
-					if (index >= 0) gameData.winnedCards[team].splice(index, 1);
+					const index = gameData.winnedCards![team].indexOf(card);
+					if (index >= 0) gameData.winnedCards![team].splice(index, 1);
 				});
 			});
 			await col.updateOne({ _id: gameData._id }, {
@@ -404,7 +426,8 @@ export default {
 			return true;
 		},
 		regroup: async (_: any, args: { gameId: string, token: string, order: number[] }) => {
-			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) }) as GameData | null;
+			if (col === null) throw new Error("Collection non initialized");
+			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) });
 			if (!gameData) throw new Error("Wrong gameId");
 			const player = gameData.players.findIndex(({ token }) => token === args.token);
 			if (player < 0) throw new Error("Wrong token");
@@ -424,7 +447,7 @@ export default {
 					hands: null,
 					currentTrick: null,
 					lastTrick: null,
-					toDeal: [].concat(...args.order.map((o) => toRegroup[o])),
+					toDeal: ([] as string[]).concat(...args.order.map((o) => toRegroup[o])),
 				},
 				// eslint-disable-next-line max-len
 				$push: { actions: { $each: [{ text: "Jeu reformé (ordre " + JSON.stringify(args.order) + ") par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"'), ticks: Date.now() }], $slice: -100 } },
