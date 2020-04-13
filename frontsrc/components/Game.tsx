@@ -44,9 +44,9 @@ const takeTrickMutationDoc = gql`
 
 
 const sortHandMutationDoc = gql`
-	mutation($gameId: ID!, $token: String!, $trump: String) {
+	mutation($gameId: ID!, $token: String!, $trump: String, $reverse: Boolean) {
 		# true si ok
-		sortHand(gameId: $gameId, token: $token, trump: $trump)
+		sortHand(gameId: $gameId, token: $token, trump: $trump, reverse: $reverse)
 	}
 `;
 
@@ -227,6 +227,7 @@ export default observer(() => {
 				gameId: globalStore.gameId,
 				token: globalStore.token,
 				trump,
+				reverse: globalStore.reverseSort,
 			} });
 			if (globalStore.refetch) await globalStore.refetch();
 		}

@@ -250,6 +250,10 @@ export default observer(() => {
 		}
 	}, [regroupMutation]);
 
+	const handleReverseSortChange = React.useCallback(action((event: React.ChangeEvent<HTMLInputElement>) => {
+		globalStore.reverseSort = event.target.checked;
+	}), [globalStore]);
+
 	const handleGameIdOnChange = React.useCallback(action((event: React.ChangeEvent<HTMLInputElement>) => {
 		globalStore.gameId = event.target.value;
 	}), []);
@@ -264,6 +268,16 @@ export default observer(() => {
 				<Button text="Rejoindre" onClick={joinGame} />
 				<Button text="Changer la couleur" onClick={setBackColor} />
 				<Button text="Changer de nom" onClick={setPlayerName} />
+				<div>
+					<label>
+						{"Tri inversé : "}
+						<input
+							type="checkbox"
+							checked={globalStore.reverseSort}
+							onChange={handleReverseSortChange}
+						/>
+					</label>
+				</div>
 				<br />
 				<br />
 				<Button text="Reformer le jeu" onClick={regroup} />

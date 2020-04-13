@@ -5,6 +5,7 @@ const globalStore = observable({
 	token: JSON.parse(localStorage.getItem('token') || 'null'),
 	actions: [],
 	players: [],
+	reverseSort: JSON.parse(localStorage.getItem('reverseSort') || 'false'),
 	lastFirstPlayer: null as number | null,
 	player: null as number | null,
 	refetch: null as (() => void) | null,
@@ -13,6 +14,7 @@ const globalStore = observable({
 autorun(() => {
 	localStorage.setItem('gameId', JSON.stringify(globalStore.gameId));
 	localStorage.setItem('token', JSON.stringify(globalStore.token));
+	localStorage.setItem('reverseSort', JSON.stringify(globalStore.reverseSort));
 });
 
 export default globalStore;

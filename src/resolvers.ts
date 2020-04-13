@@ -238,7 +238,7 @@ export default {
 			});
 			return true;
 		},
-		sortHand: async (_: any, args: { gameId: string, token: string, trump: string | null }) => {
+		sortHand: async (_: any, args: { gameId: string, token: string, trump: string | null, reverse: boolean | null }) => {
 			if (col === null) throw new Error("Collection non initialized");
 			const gameData = await col.findOne({ _id: new ObjectID(args.gameId) });
 			if (!gameData) throw new Error("Wrong gameId");
@@ -277,14 +277,16 @@ export default {
 					cards.push(...playerHand.splice(nextCardIndex, 1));
 				}
 
+				const reverseCoef = args.reverse ? -1 : 1;
+
 				cards.sort((a, b) => {
 					const aSuit = a.substr(-1);
 					const bSuit = b.substr(-1);
 					const aValue = a.substring(0, a.length - 1);
 					const bValue = b.substring(0, b.length - 1);
 					if (aSuit !== bSuit) throw new Error("Not same suit");
-					if (aSuit === args.trump) return sortedCardNumbersTrump.indexOf(aValue) - sortedCardNumbersTrump.indexOf(bValue);
-					return sortedCardNumbersNotTrump.indexOf(aValue) - sortedCardNumbersNotTrump.indexOf(bValue);
+					if (aSuit === args.trump) return reverseCoef * (sortedCardNumbersTrump.indexOf(aValue) - sortedCardNumbersTrump.indexOf(bValue));
+					return reverseCoef * (sortedCardNumbersNotTrump.indexOf(aValue) - sortedCardNumbersNotTrump.indexOf(bValue));
 				});
 
 				newPlayerHand.push(...cards);

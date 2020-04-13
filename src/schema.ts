@@ -43,7 +43,7 @@ export default `
 		# true si ok
 		deal(gameId: ID!, token: String!, by: [Int!]!, firstPlayer: Int!): Boolean!
 		# true si ok
-		sortHand(gameId: ID!, token: String!, trump: String): Boolean!
+		sortHand(gameId: ID!, token: String!, trump: String, reverse: Boolean): Boolean!
 		# true si ok
 		lookLastTrick(gameId: ID!, token: String!): [CardPlayed!]
 		# true si ok
