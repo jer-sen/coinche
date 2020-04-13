@@ -279,7 +279,6 @@ export default observer(() => {
 					</label>
 				</div>
 				<br />
-				<br />
 				<Button text="Reformer le jeu" onClick={regroup} />
 				<br />
 				<br />
