@@ -304,53 +304,57 @@ export default observer(() => {
 							</div>
 							:
 							<div style={{ height: '404px', width: ((31 * 20) + 100) + 'px', position: 'relative' }}>
-								{
-									[0, 1].map((team) =>
-										<React.Fragment key={team}>
-											{
-												data.game.winnedCards[team].map((c: string, i: number) =>
-													<Card
-														color={data.game.backColor}
-														code={c}
-														key={c}
-														style={{
-															width: '100px',
-															position: 'absolute',
-															left: (i * 20) + 'px',
-															top: (team * 202) + 'px',
-															zIndex: i,
-														}}
-													/>,
-												)
-											}
-											<div style={{ position: 'absolute', top: (160 + (team * 202)) + 'px' }}>
-												{(data.game.players[team] || "joueur " + team) + " et " + (data.game.players[2 + team] || "joueur " + (2 + team)) + " : "}
-												<b>
-													{
-														data.game.winnedCards[team].reduce((acc: number, cur: string) =>
-															acc + (({ J: 2, Q: 3, K: 4, 1: 10, A: 11 } as any)[cur.charAt(0)] || 0)
-														, 0) + (valet === team ? 18 : 0) + (neuf === team ? 14 : 0) + (belote === team ? 20 : 0) + (der === team ? 10 : 0)
-														+ " points"
-													}
-												</b>
-												{" avec "}
-												<label style={{ marginLeft: '5px' }}>
-													<input type="checkbox" checked={valet === team} onChange={countOptions[team].valet} />valet d'atout
-												</label>
-												<label style={{ marginLeft: '5px' }}>
-													<input type="checkbox" checked={neuf === team} onChange={countOptions[team].neuf} />9 d'atout
-												</label>
-												<label style={{ marginLeft: '5px' }}>
-													<input type="checkbox" checked={der === team} onChange={countOptions[team].der} />10 de der
-												</label>
-												<label style={{ marginLeft: '5px' }}>
-													<input type="checkbox" checked={belote === team} onChange={countOptions[team].belote} />belote
-												</label>
-											</div>
-										</React.Fragment>,
-									)
-								}
-								<Button text="Reformer le jeu" onClick={regroup} />
+								<div>
+									{
+										[0, 1].map((team) =>
+											<React.Fragment key={team}>
+												{
+													data.game.winnedCards[team].map((c: string, i: number) =>
+														<Card
+															color={data.game.backColor}
+															code={c}
+															key={c}
+															style={{
+																width: '100px',
+																position: 'absolute',
+																left: (i * 20) + 'px',
+																top: (team * 202) + 'px',
+																zIndex: i,
+															}}
+														/>,
+													)
+												}
+												<div style={{ position: 'absolute', top: (160 + (team * 202)) + 'px' }}>
+													{(data.game.players[team] || "joueur " + team) + " et " + (data.game.players[2 + team] || "joueur " + (2 + team)) + " : "}
+													<b>
+														{
+															data.game.winnedCards[team].reduce((acc: number, cur: string) =>
+																acc + (({ J: 2, Q: 3, K: 4, 1: 10, A: 11 } as any)[cur.charAt(0)] || 0)
+															, 0) + (valet === team ? 18 : 0) + (neuf === team ? 14 : 0) + (belote === team ? 20 : 0) + (der === team ? 10 : 0)
+															+ " points"
+														}
+													</b>
+													{" avec "}
+													<label style={{ marginLeft: '5px' }}>
+														<input type="checkbox" checked={valet === team} onChange={countOptions[team].valet} />valet d'atout
+													</label>
+													<label style={{ marginLeft: '5px' }}>
+														<input type="checkbox" checked={neuf === team} onChange={countOptions[team].neuf} />9 d'atout
+													</label>
+													<label style={{ marginLeft: '5px' }}>
+														<input type="checkbox" checked={der === team} onChange={countOptions[team].der} />10 de der
+													</label>
+													<label style={{ marginLeft: '5px' }}>
+														<input type="checkbox" checked={belote === team} onChange={countOptions[team].belote} />belote
+													</label>
+												</div>
+											</React.Fragment>,
+										)
+									}
+								</div>
+								<div>
+									<Button text="Reformer le jeu" onClick={regroup} />
+								</div>
 							</div>
 						:
 						(
