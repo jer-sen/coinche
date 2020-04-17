@@ -304,7 +304,6 @@ export default observer(() => {
 							</div>
 							:
 							<div style={{ height: '404px', width: ((31 * 20) + 100) + 'px', position: 'relative' }}>
-								<Button text="Reformer me jeu" onClick={regroup} />
 								{
 									[0, 1].map((team) =>
 										<React.Fragment key={team}>
@@ -351,6 +350,7 @@ export default observer(() => {
 										</React.Fragment>,
 									)
 								}
+								<Button text="Reformer le jeu" onClick={regroup} />
 							</div>
 						:
 						(

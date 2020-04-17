@@ -234,7 +234,7 @@ export default {
 			await col.updateOne({ _id: gameData._id }, {
 				$set: { toDeal: null, hands, currentTrick: [], winnedCards: [[], []], lastFirstPlayer: args.firstPlayer },
 				// eslint-disable-next-line max-len
-				$push: { actions: { $each: [{ text: "Cartes distribuées par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"') + " en " + JSON.stringify(args.by) + " en commançant par " + ('"' + (gameData.players[args.firstPlayer].name || "joueur " + player) + '"'), ticks: Date.now() }], $slice: -100 } },
+				$push: { actions: { $each: [{ text: "Cartes distribuées par " + ('"' + (gameData.players[player].name || "joueur " + player) + '"') + " en " + JSON.stringify(args.by) + " en commençant par " + ('"' + (gameData.players[args.firstPlayer].name || "joueur " + player) + '"'), ticks: Date.now() }], $slice: -100 } },
 			});
 			return true;
 		},
