@@ -31,7 +31,9 @@ moment.locale('fr');
 		path: graphqlPath,
 	});
 	// eslint-disable-next-line import/no-named-as-default-member
-	app.use('/', express.static('frontdist'));
+	app.use('/', express.static('frontdist', {
+		maxAge: 60 * 60 * 1000,
+	}));
 	// eslint-disable-next-line no-console
 	app.listen(PORT, () => console.log(`Listening on port ${PORT}!`));
 })();
