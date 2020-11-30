@@ -89,12 +89,14 @@ const getTop = (relativeIndex: number) => {
 	return 0;
 };
 
+(window as unknown as { pollInterval: number }).pollInterval = 1000;
+
 export default observer(() => {
 	const skip = !globalStore.gameId || !globalStore.token;
 	const { loading, error, refetch, data } = useQuery(dataQuery, {
 		variables: { id: globalStore.gameId, token: globalStore.token },
 		skip,
-		pollInterval: skip ? undefined : 1000,
+		pollInterval: skip ? undefined : (window as unknown as { pollInterval: number }).pollInterval,
 	});
 
 	const [{ valet, neuf, belote, der }, setCountOptions] = React.useState({ valet: null, neuf: null, belote: null, der: null });
